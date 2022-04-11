@@ -30,11 +30,39 @@ else{
     exit(1);
 }
 
-//path[2]="INPUTS/Dipoles.txt";
-fp_input.open(path[2].c_str());
+// Bound states part
+fp_input.open(path[2].c_str()); //path[2]="INPUTS/Dipoles.txt";
 Read_Dipoles(fp_input,Dip1,Dip2,pulse1.pol,pulse2.pol);
 fp_input.close();
 
-fp_input.open(path[1].c_str());//"INPUTS/Decays.txt"
+fp_input.open(path[1].c_str()); //"INPUTS/Decays.txt"
 Read_Decays(fp_input,Gamma,NEi);
 fp_input.close();
+
+// Continuum states part
+if(NContStat>=0){
+    for(int i=0;i<=NContStat;i++){
+        fp_input.open((ArrayCont[i].PESpath).c_str()); // Read double core-hole states
+        Read_Cont_PES(fp_input, ArrayCont, i, PES);
+        cout << "Read Continuum PES " << i << endl;
+        fp_input.close();
+        
+        int Ej = (ArrayCont[i]).StatCouplPump.size() + (ArrayCont[i]).StatCouplProbe.size();
+
+        for(int j=0;j<Ej;j++){
+            cout << ((ArrayCont[i].DIPpath)[j]).c_str() << endl;
+            fp_input.open(((ArrayCont[i].DIPpath)[j]).c_str());
+            Read_Cont_Dipoles(fp_input,ArrayCont,i,j,pulse1.pol,pulse2.pol);  // Read continuum dipoles
+            // ArrayCont[i].statesINcommon(); // Array management for RK
+            //ArrayCont[i].positionEj(NEi);
+            cout << "Read Continuum dipole " << i << " coupling " << j << endl;
+            fp_input.close();
+        }
+
+        fp_input.open((ArrayCont[i].DECAYSpath).c_str()); // Read continuum decays
+        ArrayCont[i].load_Gamma(Ej);
+        Read_Cont_Decays(fp_input, ArrayCont, Ej);
+        cout << "Read Continuum Decays " << i << endl;
+        fp_input.close();
+    }
+}

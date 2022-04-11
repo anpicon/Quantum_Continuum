@@ -387,7 +387,6 @@ void felectronicstates(ifstream& fp_input,int& NEi,vec1s& path,double& EnergyShi
             }
         }
         
-        
         if(!(getline(fp_input, s)))
         {
              printf("Can't find the end of electronicstates section.\n");
@@ -449,16 +448,170 @@ void fobservables(ifstream& fp_input,vector<bool>& iObservables,string& s,vector
     }// end reading observables
 }// end of fobservables
 
-void Read_Input
- (ifstream& fp_input,double& dt, string& iInitialState, int& NR,double& tf, int& NEi,vec1s& path, Laser& pulse1, double& sigma1, bool& gaussian1,Laser& pulse2, double& sigma2, bool& gaussian2,double& DELAY,double& EnergyShift,string& molecule,vector<bool>& iObservables)
+
+void fcontinuum(ifstream& fp_input, vec1s& path,string& s,vector<string>& str, size_t pos,vec1C& contstate,int& ind)
+{
+    int NPump = 0;
+    int NProbe = 0;
+    s="";
+    while(s==""){getline(fp_input, s);}
+    
+    while(s.find("}") == -1 || 0 == strcasecmp( s.c_str(), ""))
+    {
+        str.clear();
+        pos =s.length();
+        Separate_string(s, str, pos);
+        if( 0 ==strcasecmp(str[0].c_str(), "NCoupledPump") )
+        {
+            NPump=atof(str[1].c_str());
+        }
+        else if( 0 ==strcasecmp(str[0].c_str(), "WhichStatPump") )
+        {
+            for(int i=0;i<NPump;i++){
+                (contstate[ind].StatCouplPump).push_back(atof(str[1+i].c_str()));
+            }
+        }
+        else if( 0 ==strcasecmp(str[0].c_str(), "NCoupledProbe") )
+        {
+            NProbe=atof(str[1].c_str());
+        }
+        else if( 0 ==strcasecmp(str[0].c_str(), "WhichStatProbe") )
+        {
+            for(int i=0;i<NProbe;i++){
+                (contstate[ind].StatCouplProbe).push_back(atof(str[1+i].c_str()));
+            }
+        }
+        else if( 0 ==strcasecmp(str[0].c_str(), "Emax") )
+        {
+            int i;
+            for(i=0;i<(NPump+NProbe);i++){
+                (contstate[ind].Emax).push_back(atof(str[i+1].c_str()));
+            }
+            if(str.size() < NPump+NProbe)
+            {
+                continue;
+            }
+            else if(0 ==strcasecmp(str[i+1].c_str(), "eV"))
+            {
+                for(int i=0;i<(NPump+NProbe);i++) contstate[ind].Emax[i] *= energy_eV_au;
+            }
+            else if(0 ==strcasecmp(str[i+1].c_str(), "au") || (0 ==strcasecmp(str[i+1].c_str(), "atomicunit")))
+            {
+                continue;
+            }
+            else
+            {
+                printf("Units %s aren't allowed for Emax.\n", str[i+1].c_str());
+                exit(1);
+            }
+        }//end Emax
+        else if( 0 ==strcasecmp(str[0].c_str(), "Emin") )
+        {
+            int i;
+            for(i=0;i<(NPump+NProbe);i++){
+                (contstate[ind].Emin).push_back(atof(str[i+1].c_str()));
+            }
+            if(str.size() < NPump+NProbe)
+            {
+                continue;
+            }
+            else if(0 ==strcasecmp(str[i+1].c_str(), "eV"))
+            {
+                for(int i=0;i<(NPump+NProbe);i++) contstate[ind].Emin[i] *= energy_eV_au;
+            }
+            else if(0 ==strcasecmp(str[i+1].c_str(), "au") || (0 ==strcasecmp(str[i+1].c_str(), "atomicunit")))
+            {
+                continue;
+            }
+            else
+            {
+                printf("Units %s aren't allowed for Emin.\n", str[i+1].c_str());
+                exit(1);
+            }
+        }//end Emin
+        else if( 0 ==strcasecmp(str[0].c_str(), "dE") )
+        {
+            if(str.size() < 2)
+            {
+                contstate[ind].dE = atof(str[1].c_str());
+            }
+            else if(0 ==strcasecmp(str[2].c_str(), "eV"))
+            {
+                contstate[ind].dE = atof(str[1].c_str())*energy_eV_au;
+            }
+            else if(0 ==strcasecmp(str[2].c_str(), "au") || (0 ==strcasecmp(str[0].c_str(), "atomicunit")))
+            {
+                contstate[ind].dE = atof(str[1].c_str());
+            }
+            else
+            {
+                printf("Units %s aren't allowed for dE.\n", str[2].c_str());
+                exit(1);
+            }
+        }//end dE
+       else if( 0 ==strcasecmp(str[0].c_str(), "BE") )
+        {   
+            int i;
+            for(i=0;i<(NPump+NProbe);i++){
+                (contstate[ind].BE).push_back(atof(str[i+1].c_str()));
+                cout << i+1 << endl;
+            }
+            if(str.size() < NPump+NProbe)
+            {
+                continue;
+            }
+            else if(0 ==strcasecmp(str[i+1].c_str(), "eV"))
+            {
+                for(int i=0;i<(NPump+NProbe);i++) contstate[ind].BE[i] *= energy_eV_au;
+            }
+            else if(0 ==strcasecmp(str[i+1].c_str(), "au") || (0 ==strcasecmp(str[i+1].c_str(), "atomicunit")))
+            {
+                continue;
+            }
+            else
+            {
+                printf("Units %s aren't allowed for BE.\n", str[i+1].c_str());
+                exit(1);
+            }
+        }//end E_BE
+        else if( 0 ==strcasecmp(str[0].c_str(), "Lmax") )
+        {
+            contstate[ind].Lmax=atof(str[1].c_str());
+        }
+        else if( 0 ==strcasecmp(str[0].c_str(), "Mmax") )
+        {
+            contstate[ind].Mmax=atof(str[1].c_str());
+        }
+        else if(0 ==strcasecmp(str[0].c_str(), "PESpath")){
+            (contstate[ind]).PESpath = str[1];
+        }
+        else if(0 ==strcasecmp(str[0].c_str(), "DIPpath")){
+            for(int i=0;i<(NPump+NProbe);i++){
+                (contstate[ind].DIPpath).push_back(str[i+1]);
+                std::cout << "states: " << i << endl;
+            }
+        }
+        else if(0 ==strcasecmp(str[0].c_str(), "DECAYSpath")){
+            (contstate[ind]).DECAYSpath = str[1];
+        }
+        if(!(getline(fp_input, s)))
+        {
+             printf("Can't find the end of continuumstates section.\n");
+             exit(1);
+        }
+    }//end reading tdse
+    
+} //end of continuum block
+
+void Read_Input(ifstream& fp_input,double& dt, string& iInitialState, int& NR,double& tf, int& NEi,vec1s& path,Laser& pulse1, double& sigma1, bool& gaussian1,Laser& pulse2, double& sigma2, bool& gaussian2,double& DELAY,double& EnergyShift,string& molecule,vector<bool>& iObservables,vec1C& ArrayCont,int& NContStat)
 //(ifstream& fp_input,Laser& pulse1, Laser& pulse2, Coord_B& u1, Coord_B& u2, bool& gaussian1, bool& gaussian2, double& sigma1, double& sigma2, double& DELAY,//lasers
 //bool& iTightBinding, string& TBtype, double& dt,  //tdse options
 //bool& iWFDs, bool& iCurrent, bool& iTAbs, bool& iTAbsK   //observables
 {
+    NContStat=-1;
     string s;
 
     printf("Reading input...");
-    
     while(getline(fp_input,s))
     {
         if(s!="")
@@ -497,10 +650,14 @@ void Read_Input
             {
                 fobservables(fp_input,iObservables,s,str,pos);
             }
+            else if(0 == strcasecmp(str[0].c_str(), "continuumstate"))
+            {
+                NContStat++;
+                ArrayCont.push_back(Continuum(NContStat));
+                fcontinuum(fp_input,path,s,str,pos,ArrayCont,NContStat);
+                cout << "Ncont stats : " << NContStat << endl;
+            }
         }
     } //end while
     printf("  done \n");
 } //end read_input
-
-
-

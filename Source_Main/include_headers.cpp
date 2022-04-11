@@ -19,3 +19,4 @@
 #include "Loading_parameters.h"
 #include "Observables.h"
 #include "ReadInput.h"
+#include "Continuum.h"

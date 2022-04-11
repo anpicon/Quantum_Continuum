@@ -5,6 +5,7 @@
  *
  *
  */
+#include "Continuum.h"
 
 class Kinetic
 {
@@ -24,6 +25,12 @@ Kinetic::Kinetic(string name,double dR): _dR(dR){
     else if(name=="H"){
         double MassH=1.0078250322;
         double massAU=MassH*1822.88839;
+        Energy=1./(2.*massAU*_dR*_dR);
+    }
+    else if(name=="N2O"){
+        double MassN=14.0030740052;
+        double MassO=15.99491464;
+        double massAU=MassN*MassN*MassO*1822.88839/(2.*MassN+MassO);
         Energy=1./(2.*massAU*_dR*_dR);
     }
 }
@@ -54,6 +61,42 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
         }
         bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0];
     }
+    // ,vec1C& ArrayCont,vec1x& Vti, vec4x& biv
+    // if(NContStat>=0){
+    //     for(int i=0;i<=NContStat;i++){
+    //         ArrayCont[i].positionEj(NEi); 
+
+    //         int maxEj = (ArrayCont[i]).StatCouplPump.size() + (ArrayCont[i]).StatCouplProbe.size();
+    //         int bar = (ArrayCont[i].StatCouplPump).size();
+    //         int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
+    //         // Can a state couple with both lasers?? YES
+    //         fill(Vti.begin(), Vti.end(), (0.,0.));
+    //         for (int eps=0; eps<ArrayCont[i].NE; eps++)
+    //         {
+    //             for (int L=0; L<=ArrayCont[i].Lmax; L++)
+    //             {
+    //                 int M1=( L<=mmax ? L : mmax);
+    //                 for (int M=-M1; M<=M1; M++)
+    //                 {
+    //                     int lm = SpH(L,M,mmax); // As I call it several times, it will be faster to have it in a local variable
+                        
+    //                     for(int Ej=0; Ej<NEi; Ej++){
+    //                         Vti[0]+=c1*(ArrayCont[i].Allow[0][Ej]*(ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][Ej]][eps][lm][0]*EF1 + 
+    //                                     ArrayCont[i].Allow[0][Ej]*(ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][Ej]][eps][lm][0]*EF2)*bgs[Ej][0];
+    //                     }
+    //                     biv[i][eps][lm][0] = (-c1*ArrayCont[i].PES[i][0]- 0.5*ArrayCont[i].Gamma[i])*bgs[i][0] - Vti[0];
+
+
+    //                     // if(Ej<bar)        (ArrayCont[i].DIPpump)[Epsj][eps][SpH(L,M,mmax)][0]      = x*u1[0]+y*u1[1]+z*u1[2];
+    //                     // else if(bar == 0) (ArrayCont[i].DIPprobe)[Epsj][eps][SpH(L,M,mmax)][0]     = x*u2[0]+y*u2[1]+z*u2[2];
+    //                     // else              (ArrayCont[i].DIPprobe)[bar-Epsj][eps][SpH(L,M,mmax)][0] = x*u2[0]+y*u2[1]+z*u2[2];
+    //                     // PES path with double core-hole energies
+                       
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
     //cout << "bg " << bgsv[0][0] << " " << bgsv[20][0] << endl;
 }
 

@@ -37,6 +37,13 @@ path.resize(4);
 //path[2] Array of addresses pointing to dipole moments
 //path[3] Array of addresses pointing to initial state population
 
+//**********************************************************
+//*  Continuum States                                      *
+//**********************************************************
+int NPump;       // Number of states coupled with Pump pulse
+int NProbe;      // Number of states coupled with Probe pulse
+int NContStat;   // (Npump+Nprobe - 1) It will index the ArrayCont vector
+vec1C ArrayCont; // Array of Continuum states
 
 //**********************************************************
 //*  Observables                                           *
@@ -68,7 +75,7 @@ pulse2.set_CEP(0.);
 //**********************************************************
 //*  Output files                                          *
 //**********************************************************
-system("mkdir Output");
+system("mkdir -p Output");
 ofstream fp_population; fp_population.open("Output/Population.txt");
 ofstream fp_EF;  fp_EF.open("Output/EF.txt");
 ofstream fp_ampl;

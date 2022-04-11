@@ -48,7 +48,7 @@ int main (int argc, char* argv[])
     //**********************************************************
     //*  Read INPUT                                            *
     //**********************************************************
-    Read_Input(fp_input,dt,iInitialState,NR,tf,NEi,path,pulse1,sigma1,gaussian1,pulse2,sigma2,gaussian2,DELAY,EnergyShift,molecule,iObservables);
+    Read_Input(fp_input,dt,iInitialState,NR,tf,NEi,path,pulse1,sigma1,gaussian1,pulse2,sigma2,gaussian2,DELAY,EnergyShift,molecule,iObservables,ArrayCont,NContStat);
     fp_input.close();
     
     printf("molecule:          %s\n", molecule.c_str());

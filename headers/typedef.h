@@ -1,3 +1,6 @@
+#include "Continuum.h"
+#pragma once
+
 typedef complex<double>                         complexd;
 typedef vector<int>                             vec1i;
 typedef vector<vec1i>                           vec2i;
@@ -19,6 +22,7 @@ typedef vector<vec4x>                           vec5x;
 typedef vector<vec5x>                           vec6x;
 typedef vector<string>                          vec1s;
 typedef vector<vec1s>                           vec2s;
+typedef vector<Continuum>                       vec1C;
 
 vec1i    vecE1i; 
 vec2i    vecE2i;
