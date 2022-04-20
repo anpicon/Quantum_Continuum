@@ -44,7 +44,7 @@ if(NContStat>=0){
     for(int i=0;i<=NContStat;i++){
         fp_input.open((ArrayCont[i].PESpath).c_str()); // Read double core-hole states
         Read_Cont_PES(fp_input, ArrayCont, i, PES);
-        cout << "Read Continuum PES " << i << endl;
+        cout << "Read PES of Continuum State " << i << endl;
         fp_input.close();
         
         int Ej = (ArrayCont[i]).StatCouplPump.size() + (ArrayCont[i]).StatCouplProbe.size();
@@ -54,14 +54,15 @@ if(NContStat>=0){
             fp_input.open(((ArrayCont[i].DIPpath)[j]).c_str());
             Read_Cont_Dipoles(fp_input,ArrayCont,i,j,pulse1.pol,pulse2.pol);  // Read continuum dipoles
             // ArrayCont[i].statesINcommon(); // Array management for RK
-            //ArrayCont[i].positionEj(NEi);
-            cout << "Read Continuum dipole " << i << " coupling " << j << endl;
+            // ArrayCont[i].positionEj(NEi);
+            cout << "Read dipoles of Continuum State " << i << ", coupling number: " << j+1 << endl;
             fp_input.close();
         }
+        ArrayCont[i].positionEj(); // Prepare coupled arrays for Runge-Kutta
 
         fp_input.open((ArrayCont[i].DECAYSpath).c_str()); // Read continuum decays
         ArrayCont[i].load_Gamma(Ej);
-        Read_Cont_Decays(fp_input, ArrayCont, Ej);
+        Read_Cont_Decays(fp_input, ArrayCont, i);
         cout << "Read Continuum Decays " << i << endl;
         fp_input.close();
     }

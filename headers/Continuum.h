@@ -37,17 +37,18 @@ public:
 	vector<string> DIPpath;         // Continuum Dipole Moments Path (First the ones coupled with Pump, then Probe)
 	string PESpath;                 // Double core-hole energies Path
 	string DECAYSpath;
-	vector<int> StatCouplPump;      // States that couples with Pump
-	vector<int> StatCouplProbe;     // States that couples with Probe
+	vector<int> StatCouplPump;      // Bound states that couples with Pump from input
+	vector<int> StatCouplProbe;     // Bound states that couples with Probe from input
 	// vector<int> CommonStates;       // States that couples with both Pump and Probe
 	vector<vector<int>> Indexes;	// Indexes of couplings
-	vector<vector<double>> Allow;	    // Indexes of couplings
+	vector<vector<bool>> Allow;	    // Indexes of couplings
 	vector<double> PES;	            // Double-core hole energies
 	vector<double> Gamma;	// Decays for each continuum state
 	double dE;
 	vector<double> Emin;
 	vector<double> Emax;
-	vector<double> BE;                      // Binding Energy   
+	vector<double> BE;                      // Binding Energy
+	int maxBoundState;              // Index of the maximum bound state coupled
 	int    Lmax;
 	int    Mmax;
 	int    NE;                      // Number of energies: we define it after having Emax,Emin and dE values NE=int((Emax-Emin)/dE)
@@ -80,21 +81,73 @@ public:
 	// 	}
 	// }
 
-	void positionEj(int& NEi){
-		int count=-1;
-		for(int i=0;i<2;i++){ //Looping in pump and probe arrays
-			for(int j=0;j<NEi;j++){
-				if(i==0 && j!=StatCouplPump[j]){
-					Indexes[i].push_back(0);
-					Allow[i].push_back(0.0);
+	void positionEj(){ // I can compress the code by looping the pulses, but that way is a bit faster
+		// int maxcoupl = max(StatCouplPump.size(), StatCouplProbe.size());
+		int max1 = (StatCouplPump.size() > 0) ? *max_element(StatCouplPump.begin(), StatCouplPump.end()) : 0;
+		int max2 = (StatCouplProbe.size() > 0) ? *max_element(StatCouplProbe.begin(), StatCouplProbe.end()) : 0;
+		maxBoundState = max(max1,max2); // max bound state to construct a matrix with size: 2 x max1  
+		// For Pump pulse
+		bool check;
+		cout << "size StatCouplPump: " << StatCouplPump.size() << endl;
+		cout << "size StatCouplProbe: " << StatCouplProbe.size() << endl;
+		Indexes.resize(2);
+		Allow.resize(2);
+		for(int j=0;j<=maxBoundState;j++){
+			check=0;
+			for(int Ei=0;Ei<StatCouplPump.size();Ei++){
+				cout << "Can't be here" << endl;
+				if(j==StatCouplPump[Ei]){
+					Indexes[0].push_back(Ei);
+					Allow[0].push_back(1);
+					check=1;
 				}
-				else{
-					Indexes[i].push_back(++count);
-					Allow[i].push_back(1.0);
+			}
+			if(check==0){
+					Indexes[0].push_back(0);
+					Allow[0].push_back(0);
 				}
+		}
+		// For Probe pulse
+		for(int j=0;j<=maxBoundState;j++){
+			check=0;
+			for(int Ei=0;Ei<StatCouplProbe.size();Ei++){
+				if(j==StatCouplProbe[Ei]){
+					Indexes[1].push_back(Ei);
+					Allow[1].push_back(1);
+					check=1;
+				}
+			}
+			if(check==0){
+				Indexes[1].push_back(0);
+				Allow[1].push_back(0);
 			}
 		}
 	}
+
+	// void positionEj(){
+	// 	int maxcoupl = max(StatCouplPump.size(), StatCouplProbe.size());
+	// 	int count=-1;
+	// 	for(int i=0;i<2;i++){ //Looping in pump and probe arrays
+	// 		for(int j=0;j<maxcoupl;j++){
+	// 			if(j!=StatCouplPump[j]){
+	// 				Indexes[i].push_back(0);
+	// 				Allow[i].push_back(0.0);
+	// 			}
+	// 			else if(j==StatCouplPump[j]){
+	// 				Indexes[i].push_back(++count);
+	// 				Allow[i].push_back(1.0);
+	// 			}
+	// 			else if(j!=StatCouplProbe[j]){
+	// 				Indexes[i].push_back(0);
+	// 				Allow[i].push_back(0.0);
+	// 			}
+	// 			else{
+	// 				Indexes[i].push_back(++count);
+	// 				Allow[i].push_back(1.0);
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	void check_DIP(int& Ej, vector<int>& StatCoupl, double *allow, int *ind){
 		for(int i=0;i<StatCoupl.size();i++){

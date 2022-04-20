@@ -339,7 +339,7 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
     }
  
     string dummystring;
-    printf("Reading Continuum_Dipoles.txt file from State %i ...\n",ind);
+    printf("Reading Continuum_Dipoles.txt file from Continuum State %i ...\n",ind);
     int NE; fp_input >> dummystring >> NE; //read number of Continuum energies in file
     int NR; fp_input >> dummystring >> NR; //read number of nuclear grid printed in file
     int lmax; fp_input >> dummystring >> lmax; //read number of the maximum l quantum number
@@ -376,17 +376,17 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
             fp_input >> Rgrid[iR];
             for (int eps=0; eps<contstate[ind].NE; eps++)
             {
-                complexd dip = (0,0);
+                // complexd dip = (0,0);
                 for (int L=0; L<=lmax; L++)
                 {
                     int M1=( L<=mmax ? L : mmax);
                     for (int M=-M1; M<=M1; M++)
                     {
-                        cout << "iR: " << iR << endl;              // DEBUG
-                        cout << "eps: " << eps << endl;            // DEBUG
-                        cout << "l: " << L << " m: " << M << endl; // DEBUG
+                        // cout << "iR: " << iR << endl;              // DEBUG
+                        // cout << "eps: " << eps << endl;            // DEBUG
+                        // cout << "l: " << L << " m: " << M << endl; // DEBUG
                         complexd x,y,z; fp_input >> x >> y >> z;
-                        cout << x << " " << y << " " << z << endl; // DEBUG
+                        // cout << x << " " << y << " " << z << endl; // DEBUG
                         if(Ej<bar)        (contstate[ind].DIPpump)[Ej][eps][SpH(L,M,mmax)][iR]      = x*u1[0]+y*u1[1]+z*u1[2];
                         else if(bar == 0) (contstate[ind].DIPprobe)[Ej][eps][SpH(L,M,mmax)][iR]     = x*u2[0]+y*u2[1]+z*u2[2];
                         else              (contstate[ind].DIPprobe)[bar-Ej][eps][SpH(L,M,mmax)][iR] = x*u2[0]+y*u2[1]+z*u2[2];

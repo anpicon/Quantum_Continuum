@@ -46,7 +46,9 @@ double kintf(int iR) //NOTE: we need to include dR in the input file and transfe
 }
  */
 
-void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2)
+//void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2)
+void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2, vec1C ArrayCont, vec1x& Vti )
+
 {
     int NEi = PES.size();
     
@@ -62,42 +64,64 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
         bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0];
     }
     // ,vec1C& ArrayCont,vec1x& Vti, vec4x& biv
-    // if(NContStat>=0){
-    //     for(int i=0;i<=NContStat;i++){
-    //         ArrayCont[i].positionEj(NEi); 
+    // ADD NContStat, ArrayCont and Runge-Kutta vectors to function input
+    if(ArrayCont.size()>=0){
+        complexd pulse1, pulse2;
+        for(int i=0;i<ArrayCont.size();i++){
+            // ArrayCont[i].positionEj(NEi); 
 
-    //         int maxEj = (ArrayCont[i]).StatCouplPump.size() + (ArrayCont[i]).StatCouplProbe.size();
-    //         int bar = (ArrayCont[i].StatCouplPump).size();
-    //         int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
-    //         // Can a state couple with both lasers?? YES
-    //         fill(Vti.begin(), Vti.end(), (0.,0.));
-    //         for (int eps=0; eps<ArrayCont[i].NE; eps++)
-    //         {
-    //             for (int L=0; L<=ArrayCont[i].Lmax; L++)
-    //             {
-    //                 int M1=( L<=mmax ? L : mmax);
-    //                 for (int M=-M1; M<=M1; M++)
-    //                 {
-    //                     int lm = SpH(L,M,mmax); // As I call it several times, it will be faster to have it in a local variable
-                        
-    //                     for(int Ej=0; Ej<NEi; Ej++){
-    //                         Vti[0]+=c1*(ArrayCont[i].Allow[0][Ej]*(ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][Ej]][eps][lm][0]*EF1 + 
-    //                                     ArrayCont[i].Allow[0][Ej]*(ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][Ej]][eps][lm][0]*EF2)*bgs[Ej][0];
-    //                     }
-    //                     biv[i][eps][lm][0] = (-c1*ArrayCont[i].PES[i][0]- 0.5*ArrayCont[i].Gamma[i])*bgs[i][0] - Vti[0];
+            int Ncoupl = (ArrayCont[i]).StatCouplPump.size() + (ArrayCont[i]).StatCouplProbe.size();
+            int maxcpl= max((ArrayCont[i]).StatCouplPump.size(), (ArrayCont[i]).StatCouplProbe.size());
+            int pumpsize = (ArrayCont[i].StatCouplPump).size();
+            int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
+            // Can a state couple with both lasers?? YES
+            fill(Vti.begin(), Vti.end(), 0.);
+            for (int eps=0; eps<ArrayCont[i].NE; eps++)
+            {
+                for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                {
+                    int M1=( L<=mmax ? L : mmax);
+                    for (int M=-M1; M<=M1; M++)
+                    {
+                        int lm = spH(L,M,mmax); // As I call it several times, it will be faster to have it in a local variable
+                        // cout << "here it works" << endl;
+                        // cout << "Allow is a matrixi " << ArrayCont[i].Allow.size() << " x " << ArrayCont[i].Allow[0].size() << endl;
+                        // for(auto a:ArrayCont[i].Allow[0]) cout << a << " ";
+                        // cout << endl;
+                        // for(auto a:ArrayCont[i].Allow[1]) cout << a << " ";
+                        // cout << endl;
+                        // cout << "Max bound state " << ArrayCont[i].maxBoundState << endl;
+                        for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
+                            if(ArrayCont[i].Allow[0][Ej] == 1){
+                                pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][Ej]][eps][lm][0]*EF1;
+                                cout << "Ej for pump: "<< ArrayCont[i].Indexes[0][Ej] << endl;
+                            }
+                            else pulse1 = (0,0);
+
+                            // if(ArrayCont[i].Allow[1][Ej] == 1){
+                            //     //pulse2 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[1][Ej]][eps][lm][0]*EF2;
+                            //     cout << "Ej for probe: "<< ArrayCont[i].Indexes[1][Ej] << endl;
+                            // }
+                            // else pulse2 = (0,0);
+                            // cout << "size of bgs: " << bgs.size() << endl;
+                            // if(ArrayCont[i].Allow[0][Ej] == 1 || ArrayCont[i].Allow[1][Ej] == 1){
+                            //     Vti[0]+=c1*(pulse1 + pulse2)*bgs[Ej][0];
+                            // }
+                        }
+                        // biv[i][eps][lm][0] = (-c1*ArrayCont[i].PES[i][0]- 0.5*ArrayCont[i].Gamma[i])*bgs[i][0] - Vti[0];
 
 
-    //                     // if(Ej<bar)        (ArrayCont[i].DIPpump)[Epsj][eps][SpH(L,M,mmax)][0]      = x*u1[0]+y*u1[1]+z*u1[2];
-    //                     // else if(bar == 0) (ArrayCont[i].DIPprobe)[Epsj][eps][SpH(L,M,mmax)][0]     = x*u2[0]+y*u2[1]+z*u2[2];
-    //                     // else              (ArrayCont[i].DIPprobe)[bar-Epsj][eps][SpH(L,M,mmax)][0] = x*u2[0]+y*u2[1]+z*u2[2];
-    //                     // PES path with double core-hole energies
+                        // if(Ej<bar)        (ArrayCont[i].DIPpump)[Epsj][eps][SpH(L,M,mmax)][0]      = x*u1[0]+y*u1[1]+z*u1[2];
+                        // else if(bar == 0) (ArrayCont[i].DIPprobe)[Epsj][eps][SpH(L,M,mmax)][0]     = x*u2[0]+y*u2[1]+z*u2[2];
+                        // else              (ArrayCont[i].DIPprobe)[bar-Epsj][eps][SpH(L,M,mmax)][0] = x*u2[0]+y*u2[1]+z*u2[2];
+                        // PES path with double core-hole energies
                        
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-    //cout << "bg " << bgsv[0][0] << " " << bgsv[20][0] << endl;
+                    }
+                }
+            }
+        }
+    }
+    // cout << "bg " << bgsv[0][0] << " " << bgsv[20][0] << endl;
 }
 
 void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2)

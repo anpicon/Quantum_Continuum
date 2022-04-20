@@ -9,5 +9,8 @@ vec3d    Dip2(NEi,vec2d(NEi,vec1d(NR,0.))); // Dipole transitions Stokes: Dip[Ei
 vec1d    Gamma(NEi,0.);                     // Core-hole decay: Gamma[Ei]
 vec1x    Vt(NR,complexd(0,0));              // Vector to be used in the Runge-Kutta
 
+// Vectors for Runge-Kutta of Continuum States
+vec1x    Vti(NR,complexd(0,0));
+
 R.resize(NR);                               // R grid (interpolated) R[iR]
 for(int iR=0;iR<R.size();iR++) R[iR]=0.;
