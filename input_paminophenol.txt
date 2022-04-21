@@ -1,0 +1,58 @@
+
+molecule {
+name paminophenol
+}
+
+tdse {
+dt 0.01 au
+NR 1
+}
+
+electronicstates {
+NEi 40
+PESpath INPUTS/energy_tdse.txt
+DECAYSpath INPUTS/decays_tdse.txt
+DIPpath INPUTS/dipoles_tdse.txt
+}
+
+continuumstate {
+NCoupledPump 2
+WhichStatPump 21 22  # Ej states will be ordered by the number of bound state that they interact with 
+NCoupledProbe 0
+WhichStatProbe 0
+BE 401.0 403.0 eV
+Emax 421.0 423.0 eV
+Emin 381.0 383.0 eV
+dE 1 eV
+Gamma 0.158
+Lmax 2
+Mmax 2
+PESpath INPUTS/energies_continuum0.txt #Double core-hole energy 
+DIPpath INPUTS/dipoles_continuum0.txt INPUTS/dipoles_continuum0.txt
+DECAYSpath INPUTS/decays_continuum0.txt
+}
+
+laserpump {
+envelope gaussian
+sigma 0.2 fs      
+frequency 539 eV
+intensity 1.5e+17 wcm2
+polarization 0 0 1                   
+}
+
+laserprobe {
+envelope gaussian
+sigma 0.2 fs      
+frequency 540 eV
+intensity 0. wcm2
+polarization 0 0 1
+DELAY 0.               
+}
+
+observables {
+amplitudes
+}
+
+
+
+
