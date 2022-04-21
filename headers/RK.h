@@ -47,10 +47,11 @@ double kintf(int iR) //NOTE: we need to include dR in the input file and transfe
  */
 
 //void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2)
-void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2, vec1C ArrayCont, vec1x& Vti )
+void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2, vec1C ArrayCont)
 
 {
     int NEi = PES.size();
+    //cout << "PES size: " << NEi << endl;
     
 //#pragma omp parallel for schedule(dynamic) default(shared) -- it causes a problem due to Vt array, we should use Vt[Ei][iR]
     for (int Ei=0; Ei<NEi; Ei++)
@@ -62,20 +63,18 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
             Vt[0]+=c1*(Dip1[Ei][Ej][0]*EF1+Dip2[Ei][Ej][0]*EF2)*bgs[Ej][0];
         }
         bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0];
+        // cout << "Ei: " << Ei << " bgs: " << bgs[Ei][0] << endl;
     }
+    // exit(1);
     // ,vec1C& ArrayCont,vec1x& Vti, vec4x& biv
     // ADD NContStat, ArrayCont and Runge-Kutta vectors to function input
     if(ArrayCont.size()>=0){
         complexd pulse1, pulse2;
-        for(int i=0;i<ArrayCont.size();i++){
-            // ArrayCont[i].positionEj(NEi); 
-
-            int Ncoupl = (ArrayCont[i]).StatCouplPump.size() + (ArrayCont[i]).StatCouplProbe.size();
-            int maxcpl= max((ArrayCont[i]).StatCouplPump.size(), (ArrayCont[i]).StatCouplProbe.size());
-            int pumpsize = (ArrayCont[i].StatCouplPump).size();
+        for(int i=0;i<ArrayCont.size();i++){          
             int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
-            // Can a state couple with both lasers?? YES
-            fill(Vti.begin(), Vti.end(), 0.);
+            int lm; // As I call it several times, it will be faster to have it in a local variable
+            bool allow; // Counting couplings
+            
             for (int eps=0; eps<ArrayCont[i].NE; eps++)
             {
                 for (int L=0; L<=ArrayCont[i].Lmax; L++)
@@ -83,45 +82,31 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
                     int M1=( L<=mmax ? L : mmax);
                     for (int M=-M1; M<=M1; M++)
                     {
-                        int lm = spH(L,M,mmax); // As I call it several times, it will be faster to have it in a local variable
-                        // cout << "here it works" << endl;
-                        // cout << "Allow is a matrixi " << ArrayCont[i].Allow.size() << " x " << ArrayCont[i].Allow[0].size() << endl;
-                        // for(auto a:ArrayCont[i].Allow[0]) cout << a << " ";
-                        // cout << endl;
-                        // for(auto a:ArrayCont[i].Allow[1]) cout << a << " ";
-                        // cout << endl;
-                        // cout << "Max bound state " << ArrayCont[i].maxBoundState << endl;
-                        for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
-                            if(ArrayCont[i].Allow[0][Ej] == 1){
-                                pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][Ej]][eps][lm][0]*EF1;
-                                cout << "Ej for pump: "<< ArrayCont[i].Indexes[0][Ej] << endl;
+                        lm = spH(L,M,mmax);
+                        fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
+                        //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
+                        for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
+                            allow=0;
+                            if(ArrayCont[i].Allow[0][j] == 1){
+                                pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
+                                allow = 1;
                             }
                             else pulse1 = (0,0);
 
-                            // if(ArrayCont[i].Allow[1][Ej] == 1){
-                            //     //pulse2 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[1][Ej]][eps][lm][0]*EF2;
-                            //     cout << "Ej for probe: "<< ArrayCont[i].Indexes[1][Ej] << endl;
-                            // }
-                            // else pulse2 = (0,0);
-                            // cout << "size of bgs: " << bgs.size() << endl;
-                            // if(ArrayCont[i].Allow[0][Ej] == 1 || ArrayCont[i].Allow[1][Ej] == 1){
-                            //     Vti[0]+=c1*(pulse1 + pulse2)*bgs[Ej][0];
-                            // }
+                            if(ArrayCont[i].Allow[1][j] == 1){
+                                pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][0]*EF2;
+                            }
+                            else pulse2 = (0,0);
+
+                            ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
                         }
-                        // biv[i][eps][lm][0] = (-c1*ArrayCont[i].PES[i][0]- 0.5*ArrayCont[i].Gamma[i])*bgs[i][0] - Vti[0];
-
-
-                        // if(Ej<bar)        (ArrayCont[i].DIPpump)[Epsj][eps][SpH(L,M,mmax)][0]      = x*u1[0]+y*u1[1]+z*u1[2];
-                        // else if(bar == 0) (ArrayCont[i].DIPprobe)[Epsj][eps][SpH(L,M,mmax)][0]     = x*u2[0]+y*u2[1]+z*u2[2];
-                        // else              (ArrayCont[i].DIPprobe)[bar-Epsj][eps][SpH(L,M,mmax)][0] = x*u2[0]+y*u2[1]+z*u2[2];
-                        // PES path with double core-hole energies
-                       
+                        ArrayCont[i].bev[eps][lm][0] = (-c1*ArrayCont[i].PES[0]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
+                        // cout << "be: " << ArrayCont[i].be[0] << endl;
                     }
                 }
             }
         }
     }
-    // cout << "bg " << bgsv[0][0] << " " << bgsv[20][0] << endl;
 }
 
 void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2)
@@ -151,7 +136,7 @@ void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d&
     }
 }
 
-void Runge_Kutta_Ac(vec2x& bgs1, vec2x& bgsv, double& dt)
+void Runge_Kutta_Ac(vec2x& bgs1, vec2x& bgsv, double& dt, vec1C ArrayCont)
 {
     int NEi=bgs1.size();
     int NR=bgs1[0].size();
@@ -166,11 +151,33 @@ void Runge_Kutta_Ac(vec2x& bgs1, vec2x& bgsv, double& dt)
             }
         }
     }
-    else for (int Ei=0; Ei<NEi; Ei++) bgs1[Ei][0]+=bgsv[Ei][0]*dt;
+    else{
+        for (int Ei=0; Ei<NEi; Ei++) bgs1[Ei][0]+=bgsv[Ei][0]*dt;
+
+        if(ArrayCont.size()>=0){     
+            for(int i=0;i<ArrayCont.size();i++){          
+                int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
+                int lm; // As I call it several times, it will be faster to have it in a local variable
+                
+                for (int eps=0; eps<ArrayCont[i].NE; eps++)
+                {
+                    for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                    {
+                        int M1=( L<=mmax ? L : mmax);
+                        for (int M=-M1; M<=M1; M++)
+                        {
+                            lm = spH(L,M,mmax);
+                            ArrayCont[i].be1[eps][lm][0] += ArrayCont[i].bev[eps][lm][0]*dt;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 
-void Runge_Kutta_Ad(vec2x& bgs0, vec2x& bgs1, vec2x& bgsv, double& dt)
+void Runge_Kutta_Ad(vec2x& bgs0, vec2x& bgs1, vec2x& bgsv, double& dt, vec1C& ArrayCont, int ContMode)
 {
     int NEi=bgs1.size();
     int NR=bgs1[0].size();
@@ -185,5 +192,52 @@ void Runge_Kutta_Ad(vec2x& bgs0, vec2x& bgs1, vec2x& bgsv, double& dt)
             }
         }
     }
-    else for (int Ei=0; Ei<NEi; Ei++) bgs1[Ei][0]=bgs0[Ei][0] + bgsv[Ei][0]*dt;
+    else{
+        for (int Ei=0; Ei<NEi; Ei++) bgs1[Ei][0]=bgs0[Ei][0] + bgsv[Ei][0]*dt;
+        if(ArrayCont.size()>=0){     
+            for(int i=0;i<ArrayCont.size();i++){          
+                int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
+                int lm; // As I call it several times, it will be faster to have it in a local variable
+                if(ContMode==1){
+                    for (int eps=0; eps<ArrayCont[i].NE; eps++){
+                        for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                        {
+                            int M1=( L<=mmax ? L : mmax);
+                            for (int M=-M1; M<=M1; M++)
+                            {
+                                lm = spH(L,M,mmax);
+                                ArrayCont[i].be1[eps][lm][0] = ArrayCont[i].be[eps][lm][0] + ArrayCont[i].bev[eps][lm][0]*dt;
+                            }
+                        }
+                    }
+                }
+                else if(ContMode==2){
+                    for (int eps=0; eps<ArrayCont[i].NE; eps++){
+                        for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                        {
+                            int M1=( L<=mmax ? L : mmax);
+                            for (int M=-M1; M<=M1; M++)
+                            {
+                                lm = spH(L,M,mmax);
+                                ArrayCont[i].be2[eps][lm][0] = ArrayCont[i].be[eps][lm][0] + ArrayCont[i].bev[eps][lm][0]*dt; // CHANGE
+                            }
+                        }
+                    }
+                }
+                else{
+                    for (int eps=0; eps<ArrayCont[i].NE; eps++){
+                        for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                        {
+                            int M1=( L<=mmax ? L : mmax);
+                            for (int M=-M1; M<=M1; M++)
+                            {
+                                lm = spH(L,M,mmax);
+                                ArrayCont[i].be[eps][lm][0] = ArrayCont[i].be1[eps][lm][0] + ArrayCont[i].bev[eps][lm][0]*dt; // CHANGE
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

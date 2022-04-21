@@ -361,11 +361,12 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
     if(Ej==0){
         int sizepump = (contstate[ind].StatCouplPump).size();
         int sizeprobe = (contstate[ind].StatCouplProbe).size();
-        cout << "sizepump " << sizepump << endl;
-        cout << "sizeprob " << sizeprobe << endl;
+        // cout << "sizepump " << sizepump << endl;
+        // cout << "sizeprob " << sizeprobe << endl;
         int lm= SpH(lmax,mmax,mmax)+1;
         contstate[ind].load_DIP(sizepump, contstate[ind].NE, NR, lm, contstate[ind].DIPpump); // Give dimension DIP Pump
         contstate[ind].load_DIP(sizeprobe, contstate[ind].NE, NR, lm, contstate[ind].DIPprobe); // Give dimension DIP Probe
+        contstate[ind].load_RKvariables(contstate[ind].NE, NR, lm); // Initialize Runge-Kutta vectors
     }
 
     int bar = (contstate[ind].StatCouplPump).size();
@@ -423,25 +424,25 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
 //         // //Starting the interpolation for a finer nuclear grid
 } // End Read Continuum Dipoles
 
-void Read_Cont_Decays(ifstream& fp_input,vec1C& ArrayCont, int& ind)
-{
-    if (!fp_input.is_open())
-    {
-        cout << "Error opening Decays file" << endl;
-        exit(1);
-    }
+// void Read_Cont_Decays(ifstream& fp_input,vec1C& ArrayCont, int& ind)
+// {
+//     if (!fp_input.is_open())
+//     {
+//         cout << "Error opening Decays file" << endl;
+//         exit(1);
+//     }
     
-    printf("Reading Decays.txt file ...\n");
+//     printf("Reading Decays.txt file ...\n");
     
-    double dummy;
-    int size = (ArrayCont[ind].StatCouplPump).size() + (ArrayCont[ind].StatCouplProbe).size();
-    for (int i=0; i<size; i++)
-    {
-        fp_input >> dummy >> ArrayCont[ind].Gamma[i];
-        //printf("For state %d the decay width is: %3.4f eV -> Lifetime: %3.4f fs\n",Ei,Gamma[Ei],0.659/Gamma[Ei]);
-        ArrayCont[ind].Gamma[i]*=energy_eV_au; //we convert it from eV to a.u.
-    }
-}//End Read_PES
+//     double dummy;
+//     int size = (ArrayCont[ind].StatCouplPump).size() + (ArrayCont[ind].StatCouplProbe).size();
+//     for (int i=0; i<size; i++)
+//     {
+//         fp_input >> dummy >> ArrayCont[ind].Gamma[i];
+//         //printf("For state %d the decay width is: %3.4f eV -> Lifetime: %3.4f fs\n",Ei,Gamma[Ei],0.659/Gamma[Ei]);
+//         ArrayCont[ind].Gamma[i]*=energy_eV_au; //we convert it from eV to a.u.
+//     }
+// }//End Read_Cont_Decays
 
 void Read_Decays(ifstream& fp_input,vec1d& Gamma, int NEi)
 {

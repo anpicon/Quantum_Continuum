@@ -591,8 +591,8 @@ void fcontinuum(ifstream& fp_input, vec1s& path,string& s,vector<string>& str, s
                 std::cout << "states: " << i << endl;
             }
         }
-        else if(0 ==strcasecmp(str[0].c_str(), "DECAYSpath")){
-            (contstate[ind]).DECAYSpath = str[1];
+        else if(0 ==strcasecmp(str[0].c_str(), "Gamma")){
+            (contstate[ind]).Gamma = atof(str[1].c_str());
         }
         if(!(getline(fp_input, s)))
         {

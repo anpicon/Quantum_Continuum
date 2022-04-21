@@ -60,10 +60,10 @@ if(NContStat>=0){
         }
         ArrayCont[i].positionEj(); // Prepare coupled arrays for Runge-Kutta
 
-        fp_input.open((ArrayCont[i].DECAYSpath).c_str()); // Read continuum decays
-        ArrayCont[i].load_Gamma(Ej);
-        Read_Cont_Decays(fp_input, ArrayCont, i);
-        cout << "Read Continuum Decays " << i << endl;
-        fp_input.close();
+        // fp_input.open((ArrayCont[i].DECAYSpath).c_str()); // Read continuum decays
+        // ArrayCont[i].load_Gamma(Ej);
+        // Read_Cont_Decays(fp_input, ArrayCont, i);
+        // cout << "Read Continuum Decays " << i << endl;
+        // fp_input.close();
     }
 }
