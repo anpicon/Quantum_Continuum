@@ -387,10 +387,10 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
                         // cout << "eps: " << eps << endl;            // DEBUG
                         // cout << "l: " << L << " m: " << M << endl; // DEBUG
                         complexd x,y,z; fp_input >> x >> y >> z;
-                        // cout << x << " " << y << " " << z << endl; // DEBUG
-                        if(Ej<bar)        (contstate[ind].DIPpump)[Ej][eps][SpH(L,M,mmax)][iR]      = x*u1[0]+y*u1[1]+z*u1[2];
-                        else if(bar == 0) (contstate[ind].DIPprobe)[Ej][eps][SpH(L,M,mmax)][iR]     = x*u2[0]+y*u2[1]+z*u2[2];
-                        else              (contstate[ind].DIPprobe)[bar-Ej][eps][SpH(L,M,mmax)][iR] = x*u2[0]+y*u2[1]+z*u2[2];
+                        cout << x << " " << y << " " << z << endl; // DEBUG
+                        if(Ej<bar)        (contstate[ind].DIPpump)[Ej][eps][SpH(L,M,mmax)][0]      = x*u1[0]+y*u1[1]+z*u1[2];
+                        else if(bar == 0) (contstate[ind].DIPprobe)[Ej][eps][SpH(L,M,mmax)][0]     = x*u2[0]+y*u2[1]+z*u2[2];
+                        else              (contstate[ind].DIPprobe)[bar-Ej][eps][SpH(L,M,mmax)][0] = x*u2[0]+y*u2[1]+z*u2[2];
                     }
                 }
             }

@@ -54,6 +54,7 @@ public:
 	vector<vector<bool>> Allow;	    // Allowance of couplings
 	vector<double> PES;	            // Double-core hole energies
 	double Gamma;	// Decays for each coupling
+	double Population = 0.0;
 	double dE;
 	vector<double> Emin;
 	vector<double> Emax;
@@ -76,7 +77,6 @@ public:
 	void load_RKvariables(int& NEps, int& NR, int& lm){
 		load_UniqueStates();
 		vec3x v(NEps,vec2x(lm,vec1x(NR,complexd(0,0))));
-		// vec1x w(NR,complexd(0,0));
 		Vte = v;
 		bev = v;
 		be  = v;
@@ -131,7 +131,7 @@ public:
 };
 
 /*
-If we want to use circularly polarized laser, we shoul increase dimension to DIP vectors by separating x, y and z components
+If we want to use circularly polarized laser, we should increase dimension to DIP vectors by separating x, y and z components
 */
 
 		// void statesINcommon(){ // Use it after reading dipoles

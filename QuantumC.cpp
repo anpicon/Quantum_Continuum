@@ -94,10 +94,10 @@ int main (int argc, char* argv[])
         // sum of the probability, shoud be one
         if(time>=icont*contador)
         {
-            if (!check_conservation(fp_population,b0,time))
+            if (!check_conservation(fp_population,b0,time,ArrayCont,fp_Contpopulation))
             {
-                //printf("probability not conserved\n");
-                //exit(1);
+                // printf("probability not conserved\n");
+                // exit(1);
             }
             if (iObservables[0])
             {
@@ -132,7 +132,7 @@ int main (int argc, char* argv[])
     //**********************************************************
     //*  Ending program                                        *
     //**********************************************************
-    fp_population.close(); fp_EF.close();
+    fp_population.close(); fp_EF.close(); fp_Contpopulation.close();
     
     /*
     if (iObservables[1]){

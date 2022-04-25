@@ -8,7 +8,7 @@
 
 
 
-bool check_conservation(ofstream& fp_population,vec2x& bgs, double time)
+bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& ArrayCont,ofstream& fp_Contpopulation)
 {
     
     int NEi=bgs.size();
@@ -24,20 +24,46 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time)
         }
         sum+=sumgs[Ei];
     }
-    
-    
+
+
     //cout << "Norm " << sum << endl;
     fp_population << time*time_au_fs;
     for (int Ei=0; Ei<NEi; Ei++)
     {
         fp_population << " " << sumgs[Ei] ;
+        // cout << " aaa " << endl;
+        // cout << "size: " << ArrayCont.size() << endl;
     }
     fp_population << endl;
-    
-    if (abs(sum - 1.0) < 0.01)
-    return true;
-    else
-    return false;
+
+    if(ArrayCont.size()>=0){     
+        for(int i=0;i<ArrayCont.size();i++){ 
+            double ContPopulation =0.0;     
+            int mmax = ArrayCont[i].Mmax;
+            int lm;
+            for (int iR=0; iR<NR; iR++)
+            {
+                for (int eps=0; eps<ArrayCont[i].NE; eps++)
+                {
+                    for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                    {
+                        int M1=( L<=mmax ? L : mmax);
+                        for (int M=-M1; M<=M1; M++)
+                        {
+                            lm = spH(L,M,mmax);
+                            ContPopulation += norm(ArrayCont[i].be[eps][lm][iR]);
+                        }
+                    }
+                }
+            }
+            fp_Contpopulation << time*time_au_fs;
+            fp_Contpopulation << " " << ContPopulation;
+        }
+        fp_Contpopulation << endl;
+    }
+
+    if (abs(sum - 1.0) < 0.01) return true;
+    else return false;
 }
 
 void PrintEF(ofstream& fp_E, double& EF1, double& EF2,double& time)

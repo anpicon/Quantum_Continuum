@@ -42,7 +42,7 @@ path.resize(4);
 //**********************************************************
 int NPump;       // Number of states coupled with Pump pulse
 int NProbe;      // Number of states coupled with Probe pulse
-int NContStat;   // (Npump+Nprobe - 1) It will index the ArrayCont vector
+int NContStat;   // (Npump+Nprobe - 1, as we start counting from 0) It will index the ArrayCont vector
 vec1C ArrayCont; // Array of Continuum states
 
 //**********************************************************
@@ -79,6 +79,7 @@ system("mkdir -p Output");
 ofstream fp_population; fp_population.open("Output/Population.txt");
 ofstream fp_EF;  fp_EF.open("Output/EF.txt");
 ofstream fp_ampl;
+ofstream fp_Contpopulation; fp_Contpopulation.open("Output/ContPopulation.txt");
 
 //ofstream fp_PES;  fp_PES.open("Output/PES.txt");
 //ofstream fp_Initial;  fp_Initial.open("Output/Initial.txt");

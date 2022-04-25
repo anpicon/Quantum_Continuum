@@ -46,8 +46,7 @@ double kintf(int iR) //NOTE: we need to include dR in the input file and transfe
 }
  */
 
-//void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2)
-void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2, vec1C ArrayCont)
+void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2, vec1C& ArrayCont,int ContMode)
 
 {
     int NEi = PES.size();
@@ -70,33 +69,65 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
             int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
             int lm; // As I call it several times, it will be faster to have it in a local variable
             bool allow; // Counting couplings
-            
-            for (int eps=0; eps<ArrayCont[i].NE; eps++)
-            {
-                for (int L=0; L<=ArrayCont[i].Lmax; L++)
+            if(ContMode==0){
+                for (int eps=0; eps<ArrayCont[i].NE; eps++)
                 {
-                    int M1=( L<=mmax ? L : mmax);
-                    for (int M=-M1; M<=M1; M++)
+                    for (int L=0; L<=ArrayCont[i].Lmax; L++)
                     {
-                        lm = spH(L,M,mmax);
-                        fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
-                        //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
-                        for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
-                            allow=0;
-                            if(ArrayCont[i].Allow[0][j] == 1){
-                                pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
-                                allow = 1;
-                            }
-                            else pulse1 = (0,0);
+                        int M1=( L<=mmax ? L : mmax);
+                        for (int M=-M1; M<=M1; M++)
+                        {
+                            lm = spH(L,M,mmax);
+                            fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
+                            //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
+                            for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
+                                allow=0;
+                                if(ArrayCont[i].Allow[0][j] == 1){
+                                    pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
+                                    allow = 1;
+                                }
+                                else pulse1 = (0,0);
 
-                            if(ArrayCont[i].Allow[1][j] == 1){
-                                pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][0]*EF2;
-                            }
-                            else pulse2 = (0,0);
+                                if(ArrayCont[i].Allow[1][j] == 1){
+                                    pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][0]*EF2;
+                                }
+                                else pulse2 = (0,0);
 
-                            ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
+                                ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
+                            }
+                            ArrayCont[i].bev[eps][lm][0] = (-c1*ArrayCont[i].PES[0]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
                         }
-                        ArrayCont[i].bev[eps][lm][0] = (-c1*ArrayCont[i].PES[0]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
+                    }
+                }
+            }
+            else{
+                for (int eps=0; eps<ArrayCont[i].NE; eps++)
+                {
+                    for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                    {
+                        int M1=( L<=mmax ? L : mmax);
+                        for (int M=-M1; M<=M1; M++)
+                        {
+                            lm = spH(L,M,mmax);
+                            fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
+                            //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
+                            for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
+                                allow=0;
+                                if(ArrayCont[i].Allow[0][j] == 1){
+                                    pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
+                                    allow = 1;
+                                }
+                                else pulse1 = (0,0);
+
+                                if(ArrayCont[i].Allow[1][j] == 1){
+                                    pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][0]*EF2;
+                                }
+                                else pulse2 = (0,0);
+
+                                ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
+                            }
+                            ArrayCont[i].bev[eps][lm][0] = (-c1*ArrayCont[i].PES[0]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
+                        }
                     }
                 }
             }
@@ -104,7 +135,7 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
     }
 }
 
-void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2, vec1C ArrayCont)
+void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2, vec1C& ArrayCont, int ContMode)
 {
     
     int NEi = PES.size();
@@ -135,34 +166,70 @@ void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d&
             int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
             int lm; // As I call it several times, it will be faster to have it in a local variable
             bool allow; // Counting couplings
-            for (int iR=1; iR<NR-1; iR++)
-            {
-                for (int eps=0; eps<ArrayCont[i].NE; eps++)
+            if(ContMode==0){
+                for (int iR=1; iR<NR-1; iR++)
                 {
-                    for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                    for (int eps=0; eps<ArrayCont[i].NE; eps++)
                     {
-                        int M1=( L<=mmax ? L : mmax);
-                        for (int M=-M1; M<=M1; M++)
+                        for (int L=0; L<=ArrayCont[i].Lmax; L++)
                         {
-                            lm = spH(L,M,mmax);
-                            fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
-                            //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
-                            for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
-                                allow=0;
-                                if(ArrayCont[i].Allow[0][j] == 1){
-                                    pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][iR]*EF1;
-                                    allow = 1;
-                                }
-                                else pulse1 = (0,0);
+                            int M1=( L<=mmax ? L : mmax);
+                            for (int M=-M1; M<=M1; M++)
+                            {
+                                lm = spH(L,M,mmax);
+                                fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
+                                //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
+                                for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
+                                    allow=0;
+                                    if(ArrayCont[i].Allow[0][j] == 1){
+                                        pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][iR]*EF1;
+                                        allow = 1;
+                                    }
+                                    else pulse1 = (0,0);
 
-                                if(ArrayCont[i].Allow[1][j] == 1){
-                                    pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][iR]*EF2;
-                                }
-                                else pulse2 = (0,0);
+                                    if(ArrayCont[i].Allow[1][j] == 1){
+                                        pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][iR]*EF2;
+                                    }
+                                    else pulse2 = (0,0);
 
-                                ArrayCont[i].Vte[eps][lm][iR]+=c1*(pulse1 + pulse2)*bgs[j][iR]; // Now it has only one state (1x0 matrix)
+                                    ArrayCont[i].Vte[eps][lm][iR]+=c1*(pulse1 + pulse2)*bgs[j][iR]; // Now it has only one state (1x0 matrix)
+                                }
+                                ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
                             }
-                            ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
+                        }
+                    }
+                }
+            }
+            else{
+                for (int iR=1; iR<NR-1; iR++)
+                {
+                    for (int eps=0; eps<ArrayCont[i].NE; eps++)
+                    {
+                        for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                        {
+                            int M1=( L<=mmax ? L : mmax);
+                            for (int M=-M1; M<=M1; M++)
+                            {
+                                lm = spH(L,M,mmax);
+                                fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
+                                //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
+                                for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
+                                    allow=0;
+                                    if(ArrayCont[i].Allow[0][j] == 1){
+                                        pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][iR]*EF1;
+                                        allow = 1;
+                                    }
+                                    else pulse1 = (0,0);
+
+                                    if(ArrayCont[i].Allow[1][j] == 1){
+                                        pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][iR]*EF2;
+                                    }
+                                    else pulse2 = (0,0);
+
+                                    ArrayCont[i].Vte[eps][lm][iR]+=c1*(pulse1 + pulse2)*bgs[j][iR]; // Now it has only one state (1x0 matrix)
+                                }
+                                ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
+                            }
                         }
                     }
                 }
@@ -171,7 +238,7 @@ void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d&
     }
 }
 
-void Runge_Kutta_Ac(vec2x& bgs1, vec2x& bgsv, double& dt, vec1C ArrayCont)
+void Runge_Kutta_Ac(vec2x& bgs1, vec2x& bgsv, double& dt, vec1C& ArrayCont)
 {
     int NEi=bgs1.size();
     int NR=bgs1[0].size();
@@ -251,7 +318,7 @@ void Runge_Kutta_Ad(vec2x& bgs0, vec2x& bgs1, vec2x& bgsv, double& dt, vec1C& Ar
             for(int i=0;i<ArrayCont.size();i++){          
                 int mmax = ArrayCont[i].Mmax;
                 int lm;
-                for (int iR=0; iR<NR; iR++)
+                for (int iR=0; iR<NR; iR++) // CHANGE CONTMODE BEFORE THAT LOOP FOR INCREASING VELOCITY
                 {
                     if(ContMode==1){ // If here much faster than inside the other loops
                         for (int eps=0; eps<ArrayCont[i].NE; eps++){
@@ -297,7 +364,9 @@ void Runge_Kutta_Ad(vec2x& bgs0, vec2x& bgs1, vec2x& bgsv, double& dt, vec1C& Ar
         }
     }
     else{
-        for (int Ei=0; Ei<NEi; Ei++) bgs1[Ei][0]=bgs0[Ei][0] + bgsv[Ei][0]*dt;
+        for (int Ei=0; Ei<NEi; Ei++){
+            bgs1[Ei][0]=bgs0[Ei][0] + bgsv[Ei][0]*dt;
+        }
         if(ArrayCont.size()>=0){     
             for(int i=0;i<ArrayCont.size();i++){          
                 int mmax = ArrayCont[i].Mmax;
@@ -323,7 +392,7 @@ void Runge_Kutta_Ad(vec2x& bgs0, vec2x& bgs1, vec2x& bgsv, double& dt, vec1C& Ar
                             for (int M=-M1; M<=M1; M++)
                             {
                                 lm = spH(L,M,mmax);
-                                ArrayCont[i].be2[eps][lm][0] = ArrayCont[i].be[eps][lm][0] + ArrayCont[i].bev[eps][lm][0]*dt; // CHANGE
+                                ArrayCont[i].be2[eps][lm][0] = ArrayCont[i].be[eps][lm][0] + ArrayCont[i].bev[eps][lm][0]*dt;
                             }
                         }
                     }
@@ -336,7 +405,8 @@ void Runge_Kutta_Ad(vec2x& bgs0, vec2x& bgs1, vec2x& bgsv, double& dt, vec1C& Ar
                             for (int M=-M1; M<=M1; M++)
                             {
                                 lm = spH(L,M,mmax);
-                                ArrayCont[i].be[eps][lm][0] = ArrayCont[i].be1[eps][lm][0] + ArrayCont[i].bev[eps][lm][0]*dt; // CHANGE
+                                ArrayCont[i].be[eps][lm][0] = ArrayCont[i].be1[eps][lm][0] + ArrayCont[i].bev[eps][lm][0]*dt;
+                                // cout << ArrayCont[i].be[eps][lm][0] << endl;
                             }
                         }
                     }
