@@ -272,7 +272,7 @@ void Read_Cont_PES(ifstream& fp_input,vec1C& ArrayCont,int& ind, vec2d& PES)
     vec1d Rgrid(NR,0.);
     
     fp_input >> dummystring >> dummystring; // Reading headers
-    fp_input >> ArrayCont[ind].PES[0];
+    fp_input >> dummystring >> ArrayCont[ind].PES[0];
     
     // if (NR>1) {
     //     for (int iR=0; iR<NR; iR++)
@@ -347,7 +347,7 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
     
     vec1d Rgrid(NR,0.);
 
-    contstate[ind].NE=int(((contstate[ind].Emax[0]-contstate[ind].Emin[0])/contstate[ind].dE)); //Change to read parameters
+    contstate[ind].NE=int(((contstate[ind].Emax-contstate[ind].Emin)/contstate[ind].dE)); //Change to read parameters
     cout << "   number of epsilon points : " << contstate[ind].NE << endl;  // DEBUG
     int foo = SpH(contstate[ind].Lmax,contstate[ind].Mmax,contstate[ind].Mmax);
     cout << "DIMENSION OF HEADER: " << (foo+1)*3+1 << endl; /// DEBUG
@@ -366,6 +366,7 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
         int lm= SpH(lmax,mmax,mmax)+1;
         contstate[ind].load_DIP(sizepump, contstate[ind].NE, NR, lm, contstate[ind].DIPpump); // Give dimension DIP Pump
         contstate[ind].load_DIP(sizeprobe, contstate[ind].NE, NR, lm, contstate[ind].DIPprobe); // Give dimension DIP Probe
+        contstate[ind].load_E(); // Load Continuum photoelectron energies
         contstate[ind].load_RKvariables(contstate[ind].NE, NR, lm); // Initialize Runge-Kutta vectors
     }
 
@@ -387,10 +388,11 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
                         // cout << "eps: " << eps << endl;            // DEBUG
                         // cout << "l: " << L << " m: " << M << endl; // DEBUG
                         complexd x,y,z; fp_input >> x >> y >> z;
-                        cout << x << " " << y << " " << z << endl; // DEBUG
+                        // cout << x << " " << y << " " << z << endl; // DEBUG
                         if(Ej<bar)        (contstate[ind].DIPpump)[Ej][eps][SpH(L,M,mmax)][0]      = x*u1[0]+y*u1[1]+z*u1[2];
                         else if(bar == 0) (contstate[ind].DIPprobe)[Ej][eps][SpH(L,M,mmax)][0]     = x*u2[0]+y*u2[1]+z*u2[2];
                         else              (contstate[ind].DIPprobe)[bar-Ej][eps][SpH(L,M,mmax)][0] = x*u2[0]+y*u2[1]+z*u2[2];
+                        // cout << "Ej: " << Ej << " eps: " << eps << " lm: " << SpH(L,M,mmax) << " " << x << " " << y << " " << z << endl;
                     }
                 }
             }

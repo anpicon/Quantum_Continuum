@@ -61,14 +61,23 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
             Vt[0]+=c1*(Dip1[Ei][Ej][0]*EF1+Dip2[Ei][Ej][0]*EF2)*bgs[Ej][0];
         }
         bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0];
+        // cout << PES[Ei][0] << endl;
     }
 
     if(ArrayCont.size()>=0){
         complexd pulse1, pulse2;
-        for(int i=0;i<ArrayCont.size();i++){          
+        for(int i=0;i<ArrayCont.size();i++){      
+            // for(auto a:ArrayCont[i].Allow[0]) cout << a << " ";
+            // cout << endl;
+            // for(auto a:ArrayCont[i].Allow[1]) cout << a << " ";
+            // cout << endl;
+            // for(auto a:ArrayCont[i].Indexes[0]) cout << a << " ";
+            // cout << endl;
+            // for(auto a:ArrayCont[i].Indexes[1]) cout << a << " ";
+            // cout << endl;
+            // exit(1);  
             int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
             int lm; // As I call it several times, it will be faster to have it in a local variable
-            bool allow; // Counting couplings
             if(ContMode==0){
                 for (int eps=0; eps<ArrayCont[i].NE; eps++)
                 {
@@ -81,10 +90,8 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
                             fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
                             //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
                             for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
-                                allow=0;
                                 if(ArrayCont[i].Allow[0][j] == 1){
                                     pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
-                                    allow = 1;
                                 }
                                 else pulse1 = (0,0);
 
@@ -94,8 +101,15 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
                                 else pulse2 = (0,0);
 
                                 ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
+                                // cout << "j: " << j << " Correct index: " << ArrayCont[i].Indexes[0][j] <<  " allowance: " << ArrayCont[i].Allow[0][j] << endl;
+                                // cout << "j: " << j << " Correct index: " << ArrayCont[i].Indexes[1][j] <<  " allowance: " << ArrayCont[i].Allow[1][j] << endl;
                             }
-                            ArrayCont[i].bev[eps][lm][0] = (-c1*ArrayCont[i].PES[0]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
+                            // cout << ArrayCont[i].Vte[eps][lm][0] << endl;
+
+                            ArrayCont[i].bev[eps][lm][0] = (-c1*(ArrayCont[i].PES[0]+ArrayCont[i].E[eps])- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
+                            // cout << ArrayCont[i].bev[eps][lm][0] << endl;
+                            // cout << ArrayCont[i].PES[0] << endl;
+                            // cout << ArrayCont[i].PES[0]+ArrayCont[i].E[eps] << endl;
                         }
                     }
                 }
@@ -112,10 +126,8 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
                             fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
                             //for(int Ej=0; Ej<=ArrayCont[i].maxBoundState; Ej++){
                             for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
-                                allow=0;
                                 if(ArrayCont[i].Allow[0][j] == 1){
                                     pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
-                                    allow = 1;
                                 }
                                 else pulse1 = (0,0);
 
@@ -126,7 +138,7 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
 
                                 ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
                             }
-                            ArrayCont[i].bev[eps][lm][0] = (-c1*ArrayCont[i].PES[0]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
+                            ArrayCont[i].bev[eps][lm][0] = (-c1*(ArrayCont[i].PES[0]+ArrayCont[i].E[eps])- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
                         }
                     }
                 }
@@ -194,7 +206,7 @@ void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d&
 
                                     ArrayCont[i].Vte[eps][lm][iR]+=c1*(pulse1 + pulse2)*bgs[j][iR]; // Now it has only one state (1x0 matrix)
                                 }
-                                ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
+                                ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
                             }
                         }
                     }
@@ -228,7 +240,7 @@ void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d&
 
                                     ArrayCont[i].Vte[eps][lm][iR]+=c1*(pulse1 + pulse2)*bgs[j][iR]; // Now it has only one state (1x0 matrix)
                                 }
-                                ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
+                                ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
                             }
                         }
                     }

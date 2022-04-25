@@ -483,65 +483,51 @@ void fcontinuum(ifstream& fp_input, vec1s& path,string& s,vector<string>& str, s
         }
         else if( 0 ==strcasecmp(str[0].c_str(), "Emax") )
         {
-            int i;
-            for(i=0;i<(NPump+NProbe);i++){
-                (contstate[ind].Emax).push_back(atof(str[i+1].c_str()));
-            }
-            if(str.size() < NPump+NProbe)
+            contstate[ind].Emax = atof(str[1].c_str());
+
+            if(0 ==strcasecmp(str[2].c_str(), "eV"))
             {
-                continue;
+                contstate[ind].Emax *= energy_eV_au;
             }
-            else if(0 ==strcasecmp(str[i+1].c_str(), "eV"))
-            {
-                for(int i=0;i<(NPump+NProbe);i++) contstate[ind].Emax[i] *= energy_eV_au;
-            }
-            else if(0 ==strcasecmp(str[i+1].c_str(), "au") || (0 ==strcasecmp(str[i+1].c_str(), "atomicunit")))
+            else if(0 ==strcasecmp(str[2].c_str(), "au") || (0 ==strcasecmp(str[2].c_str(), "atomicunit")))
             {
                 continue;
             }
             else
             {
-                printf("Units %s aren't allowed for Emax.\n", str[i+1].c_str());
+                printf("Units %s aren't allowed for Emax.\n", str[2].c_str());
                 exit(1);
             }
         }//end Emax
         else if( 0 ==strcasecmp(str[0].c_str(), "Emin") )
         {
-            int i;
-            for(i=0;i<(NPump+NProbe);i++){
-                (contstate[ind].Emin).push_back(atof(str[i+1].c_str()));
-            }
-            if(str.size() < NPump+NProbe)
+            contstate[ind].Emin = atof(str[1].c_str());
+
+            if(0 ==strcasecmp(str[2].c_str(), "eV"))
             {
-                continue;
+                contstate[ind].Emin *= energy_eV_au;
             }
-            else if(0 ==strcasecmp(str[i+1].c_str(), "eV"))
-            {
-                for(int i=0;i<(NPump+NProbe);i++) contstate[ind].Emin[i] *= energy_eV_au;
-            }
-            else if(0 ==strcasecmp(str[i+1].c_str(), "au") || (0 ==strcasecmp(str[i+1].c_str(), "atomicunit")))
+            else if(0 ==strcasecmp(str[2].c_str(), "au") || (0 ==strcasecmp(str[2].c_str(), "atomicunit")))
             {
                 continue;
             }
             else
             {
-                printf("Units %s aren't allowed for Emin.\n", str[i+1].c_str());
+                printf("Units %s aren't allowed for Emin.\n", str[2].c_str());
                 exit(1);
             }
         }//end Emin
         else if( 0 ==strcasecmp(str[0].c_str(), "dE") )
         {
-            if(str.size() < 2)
+            contstate[ind].dE = atof(str[1].c_str());
+
+            if(0 ==strcasecmp(str[2].c_str(), "eV"))
             {
-                contstate[ind].dE = atof(str[1].c_str());
+                contstate[ind].dE *= energy_eV_au;
             }
-            else if(0 ==strcasecmp(str[2].c_str(), "eV"))
+            else if(0 ==strcasecmp(str[2].c_str(), "au") || (0 ==strcasecmp(str[2].c_str(), "atomicunit")))
             {
-                contstate[ind].dE = atof(str[1].c_str())*energy_eV_au;
-            }
-            else if(0 ==strcasecmp(str[2].c_str(), "au") || (0 ==strcasecmp(str[0].c_str(), "atomicunit")))
-            {
-                contstate[ind].dE = atof(str[1].c_str());
+                continue;
             }
             else
             {
@@ -592,7 +578,21 @@ void fcontinuum(ifstream& fp_input, vec1s& path,string& s,vector<string>& str, s
             }
         }
         else if(0 ==strcasecmp(str[0].c_str(), "Gamma")){
-            (contstate[ind]).Gamma = atof(str[1].c_str());
+            contstate[ind].Gamma = atof(str[1].c_str());
+
+            if(0 ==strcasecmp(str[2].c_str(), "eV"))
+            {
+                contstate[ind].Gamma *= energy_eV_au;
+            }
+            else if(0 ==strcasecmp(str[2].c_str(), "au") || (0 ==strcasecmp(str[2].c_str(), "atomicunit")))
+            {
+                continue;
+            }
+            else
+            {
+                printf("Units %s aren't allowed for Gamma.\n", str[2].c_str());
+                exit(1);
+            }
         }
         if(!(getline(fp_input, s)))
         {

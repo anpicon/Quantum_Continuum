@@ -7,6 +7,9 @@ typedef vector<complexd>                        vec1x;
 typedef vector<vec1x>                           vec2x;
 typedef vector<vec2x>                           vec3x;
 typedef vector<vec3x>                           vec4x;
+typedef vector<double>                          vec1d;
+typedef vector<vec1d>                           vec2d;
+typedef vector<vec2d>                           vec3d;
 
 //Notation for saving spherical harmonic basis
 int spH(int l, int m, int mmax){
@@ -45,35 +48,43 @@ public:
 	}
 	vector<string> DIPpath;         // Continuum Dipole Moments Path (First the ones coupled with Pump, then Probe)
 	string PESpath;                 // Double core-hole energies Path
-	// string DECAYSpath;
+	
 	vector<int> StatCouplPump;      // Bound states that couples with Pump from input
 	vector<int> StatCouplProbe;     // Bound states that couples with Probe from input
 	vector<int> UniqueStates;
-	// vector<int> CommonStates;       // States that couples with both Pump and Probe
+	// vector<int> CommonStates;    // States that couples with both Pump and Probe
 	vector<vector<int>> Indexes;	// Indexes of couplings
 	vector<vector<bool>> Allow;	    // Allowance of couplings
 	vector<double> PES;	            // Double-core hole energies
-	double Gamma;	// Decays for each coupling
+	double Gamma;	                // Decays for each coupling
 	double Population = 0.0;
+	vector<double> E;
+	double Emax;
+	double Emin;
 	double dE;
-	vector<double> Emin;
-	vector<double> Emax;
-	// int Emin;
-	// int Emax;
-	vector<double> BE;                      // Binding Energy
+	vector<double> BE;              // Binding Energy
 	int maxBoundState;              // Index of the maximum bound state coupled
 	int    Lmax;
 	int    Mmax;
 	int    NE;                      // Number of energies: we define it after having Emax,Emin and dE values NE=int((Emax-Emin)/dE)
 	vec4x DIPpump;					// Dipoles that couple with pump laser
 	vec4x DIPprobe;                 // Dipoles that couple with probe pulse
+	// Runge-Kutta variables
 	vec3x Vte;
 	vec3x bev;
 	vec3x be;
 	vec3x be1;
 	vec3x be2;
-	
-
+	void load_E(){
+		vector<double> v(NE);
+		E = v;
+		for(int i=0;i<NE;i++){
+			// cout << "Emin is: " << Emin << endl;
+			// cout << "dE is: " << dE << endl;
+			E[i] = (Emin + i*dE);
+			// cout << E[i] << " " << E[i]*energy_eV_au << endl;
+		}
+	}
 	void load_RKvariables(int& NEps, int& NR, int& lm){
 		load_UniqueStates();
 		vec3x v(NEps,vec2x(lm,vec1x(NR,complexd(0,0))));
