@@ -36,7 +36,7 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& 
     }
     fp_population << endl;
 
-    if(ArrayCont.size()>=0){     
+    if(ArrayCont.size()>0){     
         for(int i=0;i<ArrayCont.size();i++){ 
             double ContPopulation =0.0;     
             int mmax = ArrayCont[i].Mmax;
@@ -51,7 +51,7 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& 
                         for (int M=-M1; M<=M1; M++)
                         {
                             lm = spH(L,M,mmax);
-                            ContPopulation += norm(ArrayCont[i].be[eps][lm][iR]);
+                            ContPopulation += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
                         }
                     }
                 }
@@ -64,6 +64,32 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& 
 
     if (abs(sum - 1.0) < 0.01) return true;
     else return false;
+}
+
+void PrintXPS(ofstream& fp_xps, double time, vec1C& ArrayCont){
+    int NR=ArrayCont[0].PES.size();
+    for(int i=0;i<ArrayCont.size();i++){ 
+        vector <double> XPS(ArrayCont[i].NE,0.0);     
+        int mmax = ArrayCont[i].Mmax;
+        int lm;
+        for (int iR=0; iR<NR; iR++)
+        {
+            for (int eps=0; eps<ArrayCont[i].NE; eps++)
+            {
+                for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                {
+                    int M1=( L<=mmax ? L : mmax);
+                    for (int M=-M1; M<=M1; M++)
+                    {
+                        lm = spH(L,M,mmax);
+                        XPS[eps] += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
+                    }
+                }
+                fp_xps << (ArrayCont[i].Emin + ArrayCont[i].dE*double(eps))*energy_au_eV;
+                fp_xps << " " << XPS[eps] << endl;
+            }
+        } 
+    }
 }
 
 void PrintEF(ofstream& fp_E, double& EF1, double& EF2,double& time)
@@ -99,3 +125,4 @@ void PrintAmpl(ofstream& fp_E, vec2d& PES, vec2x& b0)
         fp_E << endl;
     }
 } //End PrintAmpl
+

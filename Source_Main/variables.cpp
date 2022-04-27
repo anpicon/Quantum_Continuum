@@ -48,9 +48,10 @@ vec1C ArrayCont; // Array of Continuum states
 //**********************************************************
 //*  Observables                                           *
 //**********************************************************
-vector<bool> iObservables(2);                // Vector to keep track of the observables to print or compute
+vector<bool> iObservables(3);                // Vector to keep track of the observables to print or compute
 iObservables[0]=false;                       // Print wave functions
 iObservables[1]=false;                       // Print amplitudes and energies after pulse
+iObservables[2]=false;                       // Print XPS spectrum
 
 
 //**********************************************************
@@ -79,6 +80,7 @@ system("mkdir -p Output");
 ofstream fp_population; fp_population.open("Output/Population.txt");
 ofstream fp_EF;  fp_EF.open("Output/EF.txt");
 ofstream fp_ampl;
+system("mkdir -p Output/XPS");
 ofstream fp_Contpopulation; fp_Contpopulation.open("Output/ContPopulation.txt");
 
 //ofstream fp_PES;  fp_PES.open("Output/PES.txt");

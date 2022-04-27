@@ -61,7 +61,8 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
             Vt[0]+=c1*(Dip1[Ei][Ej][0]*EF1+Dip2[Ei][Ej][0]*EF2)*bgs[Ej][0];
         }
         bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0];
-        // cout << PES[Ei][0] << endl;
+        // cout << "Ei: " << Ei << " " << PES[Ei][0] << endl;
+        // cout << Gamma[Ei] << endl;
     }
 
     if(ArrayCont.size()>=0){
@@ -107,9 +108,11 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
                             // cout << ArrayCont[i].Vte[eps][lm][0] << endl;
 
                             ArrayCont[i].bev[eps][lm][0] = (-c1*(ArrayCont[i].PES[0]+ArrayCont[i].E[eps])- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
-                            // cout << ArrayCont[i].bev[eps][lm][0] << endl;
-                            // cout << ArrayCont[i].PES[0] << endl;
-                            // cout << ArrayCont[i].PES[0]+ArrayCont[i].E[eps] << endl;
+                            // cout << ArrayCont[i].Gamma << endl;
+                            // cout << "0: " << ArrayCont[i].bev[eps][lm][0] << endl;
+                            // cout << "PES: " << ArrayCont[i].PES[0] << endl;
+                            // cout << "EPS: "<< ArrayCont[i].E[eps] << endl;
+                            // cout << "PES+EPS: "<< ArrayCont[i].PES[0]+ArrayCont[i].E[eps] << endl;
                         }
                     }
                 }
@@ -139,6 +142,7 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
                                 ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
                             }
                             ArrayCont[i].bev[eps][lm][0] = (-c1*(ArrayCont[i].PES[0]+ArrayCont[i].E[eps])- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
+                            // cout << "1: " << ArrayCont[i].bev[eps][lm][0] << endl;
                         }
                     }
                 }
@@ -206,7 +210,7 @@ void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d&
 
                                     ArrayCont[i].Vte[eps][lm][iR]+=c1*(pulse1 + pulse2)*bgs[j][iR]; // Now it has only one state (1x0 matrix)
                                 }
-                                ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
+                                ArrayCont[i].bev[eps][lm][iR] = (-c1*(ArrayCont[i].PES[iR]+ArrayCont[i].E[eps])- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
                             }
                         }
                     }
@@ -240,7 +244,7 @@ void Runge_Kutta_Df(Kinetic NuclearKE,vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d&
 
                                     ArrayCont[i].Vte[eps][lm][iR]+=c1*(pulse1 + pulse2)*bgs[j][iR]; // Now it has only one state (1x0 matrix)
                                 }
-                                ArrayCont[i].bev[eps][lm][iR] = (-c1*ArrayCont[i].PES[iR]- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
+                                ArrayCont[i].bev[eps][lm][iR] = (-c1*(ArrayCont[i].PES[iR]+ArrayCont[i].E[eps])- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][iR] - ArrayCont[i].Vte[eps][lm][0];
                             }
                         }
                     }

@@ -79,10 +79,9 @@ public:
 		vector<double> v(NE);
 		E = v;
 		for(int i=0;i<NE;i++){
-			// cout << "Emin is: " << Emin << endl;
-			// cout << "dE is: " << dE << endl;
-			E[i] = (Emin + i*dE);
-			// cout << E[i] << " " << E[i]*energy_eV_au << endl;
+			E[i] = (Emin + double(i)*dE);
+			// E[i] = (-20. * energy_eV_au + double(i)*dE);
+			// cout << E[i] << " " << E[i]*energy_au_eV << endl;
 		}
 	}
 	void load_RKvariables(int& NEps, int& NR, int& lm){

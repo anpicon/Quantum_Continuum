@@ -272,7 +272,14 @@ void Read_Cont_PES(ifstream& fp_input,vec1C& ArrayCont,int& ind, vec2d& PES)
     vec1d Rgrid(NR,0.);
     
     fp_input >> dummystring >> dummystring; // Reading headers
-    fp_input >> dummystring >> ArrayCont[ind].PES[0];
+    // ArrayCont[ind].PES[0] -= PES[0][0];
+    if (NR==1) {
+        fp_input >> Rgrid[0];
+        fp_input >> ArrayCont[ind].PES[0];
+        //We find the minimum energy in the ground state and we shift all energies
+        // cout << ArrayCont[ind].PES[0] << endl;
+        printf("Initial grid R=(%3.3f, %3.3f), #R=%d , dR= %1.3f\n", Rgrid[0],Rgrid[NR-1],NR,0.);
+    }
     
     // if (NR>1) {
     //     for (int iR=0; iR<NR; iR++)
@@ -311,21 +318,7 @@ void Read_Cont_PES(ifstream& fp_input,vec1C& ArrayCont,int& ind, vec2d& PES)
     //         }
     //     }
     //     printf("Interpolated grid R=(%3.3f, %3.3f), #R=%d , dR= %1.3f\n", R[0],R[NRi-1],NRi,abs(R[1]-R[0]));
-    // }
-    if (NR==1) {
-        for (int iR=0; iR<NR; iR++)
-        {
-            fp_input >> Rgrid[iR];
-            fp_input >> ArrayCont[ind].PES[iR];
-        }
-        //We find the minimum energy in the ground state and we shift all energies
-        for (int iR=0; iR<NR; iR++){
-            ArrayCont[ind].PES[iR]-=PES[0][iR];
-        }
-        
-        printf("Initial grid R=(%3.3f, %3.3f), #R=%d , dR= %1.3f\n", Rgrid[0],Rgrid[NR-1],NR,0.);
-    }
-    
+    // }        
 }//End Read_Cont_PES
 
  //Read Dipoles for continuum states

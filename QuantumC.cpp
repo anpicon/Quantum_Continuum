@@ -117,6 +117,16 @@ int main (int argc, char* argv[])
                 PrintAmpl(fp_wf,PES,b0);
                 fp_wf.close();
             }
+            if (iObservables[2])
+            {
+                string name_file; stringstream sname;
+                sname.seekp(0,ios::beg); sname << icont;
+                name_file= "Output/XPS/xps_" + sname.str() + ".txt";
+                ofstream fp_wf; fp_wf.open(name_file.c_str());
+                PrintXPS(fp_wf, time, ArrayCont);
+                fp_wf.close();
+                // cout << time << " " << time*time_au_fs << endl;
+            }
             PrintEF(fp_EF,EF1,EF2,time);
             icont++;
         }

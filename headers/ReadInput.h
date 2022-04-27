@@ -438,7 +438,10 @@ void fobservables(ifstream& fp_input,vector<bool>& iObservables,string& s,vector
         {
             iObservables[1]=true;
         }
-
+        else if(0 ==strcasecmp(str[0].c_str(), "XPS") )
+        {
+            iObservables[2]=true;
+        }
         
         if(!(getline(fp_input, s)))
         {
