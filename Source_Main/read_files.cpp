@@ -53,17 +53,9 @@ if(NContStat>=0){
             cout << ((ArrayCont[i].DIPpath)[j]).c_str() << endl;
             fp_input.open(((ArrayCont[i].DIPpath)[j]).c_str());
             Read_Cont_Dipoles(fp_input,ArrayCont,i,j,pulse1.pol,pulse2.pol);  // Read continuum dipoles
-            // ArrayCont[i].statesINcommon(); // Array management for RK
-            // ArrayCont[i].positionEj(NEi);
-            cout << "Read dipoles of Continuum State " << i << ", coupling number: " << j+1 << endl;
+            cout << "Dipoles of Continuum State " << i << " and Bound State " << j+1 << " OK" <<endl;
             fp_input.close();
         }
         ArrayCont[i].positionEj(); // Prepare coupled arrays for Runge-Kutta
-
-        // fp_input.open((ArrayCont[i].DECAYSpath).c_str()); // Read continuum decays
-        // ArrayCont[i].load_Gamma(Ej);
-        // Read_Cont_Decays(fp_input, ArrayCont, i);
-        // cout << "Read Continuum Decays " << i << endl;
-        // fp_input.close();
     }
 }

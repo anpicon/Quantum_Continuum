@@ -31,8 +31,6 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& 
     for (int Ei=0; Ei<NEi; Ei++)
     {
         fp_population << " " << sumgs[Ei] ;
-        // cout << " aaa " << endl;
-        // cout << "size: " << ArrayCont.size() << endl;
     }
     fp_population << endl;
 

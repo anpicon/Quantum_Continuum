@@ -602,9 +602,9 @@ void fcontinuum(ifstream& fp_input, vec1s& path,string& s,vector<string>& str, s
              printf("Can't find the end of continuumstates section.\n");
              exit(1);
         }
-    }//end reading tdse
+    }//end while
     
-} //end of continuum block
+} //end of Continuum block
 
 void Read_Input(ifstream& fp_input,double& dt, string& iInitialState, int& NR,double& tf, int& NEi,vec1s& path,Laser& pulse1, double& sigma1, bool& gaussian1,Laser& pulse2, double& sigma2, bool& gaussian2,double& DELAY,double& EnergyShift,string& molecule,vector<bool>& iObservables,vec1C& ArrayCont,int& NContStat)
 //(ifstream& fp_input,Laser& pulse1, Laser& pulse2, Coord_B& u1, Coord_B& u2, bool& gaussian1, bool& gaussian2, double& sigma1, double& sigma2, double& DELAY,//lasers

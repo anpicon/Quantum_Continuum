@@ -262,7 +262,7 @@ void Read_Cont_PES(ifstream& fp_input,vec1C& ArrayCont,int& ind, vec2d& PES)
         printf("Error opening Continuum PES file ...\n");
         exit(1);
     }
-    printf("Reading Continuum PES.txt file ...\n");
+    printf("Reading Continuum_PES.txt file ...\n");
     
     string dummystring;
     
@@ -272,12 +272,9 @@ void Read_Cont_PES(ifstream& fp_input,vec1C& ArrayCont,int& ind, vec2d& PES)
     vec1d Rgrid(NR,0.);
     
     fp_input >> dummystring >> dummystring; // Reading headers
-    // ArrayCont[ind].PES[0] -= PES[0][0];
     if (NR==1) {
         fp_input >> Rgrid[0];
         fp_input >> ArrayCont[ind].PES[0];
-        //We find the minimum energy in the ground state and we shift all energies
-        // cout << ArrayCont[ind].PES[0] << endl;
         printf("Initial grid R=(%3.3f, %3.3f), #R=%d , dR= %1.3f\n", Rgrid[0],Rgrid[NR-1],NR,0.);
     }
     
@@ -341,9 +338,9 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
     vec1d Rgrid(NR,0.);
 
     contstate[ind].NE=int(((contstate[ind].Emax-contstate[ind].Emin)/contstate[ind].dE)); //Change to read parameters
-    cout << "   number of epsilon points : " << contstate[ind].NE << endl;  // DEBUG
+    cout << "   Number of Continuum energies : " << contstate[ind].NE << endl;  // DEBUG
     int foo = SpH(contstate[ind].Lmax,contstate[ind].Mmax,contstate[ind].Mmax);
-    cout << "DIMENSION OF HEADER: " << (foo+1)*3+1 << endl; /// DEBUG
+    // cout << "DIMENSION OF HEADER: " << (foo+1)*3+1 << endl; /// DEBUG
 
     if (NE != contstate[ind].NE)
     {
@@ -354,8 +351,6 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
     if(Ej==0){
         int sizepump = (contstate[ind].StatCouplPump).size();
         int sizeprobe = (contstate[ind].StatCouplProbe).size();
-        // cout << "sizepump " << sizepump << endl;
-        // cout << "sizeprob " << sizeprobe << endl;
         int lm= SpH(lmax,mmax,mmax)+1;
         contstate[ind].load_DIP(sizepump, contstate[ind].NE, NR, lm, contstate[ind].DIPpump); // Give dimension DIP Pump
         contstate[ind].load_DIP(sizeprobe, contstate[ind].NE, NR, lm, contstate[ind].DIPprobe); // Give dimension DIP Probe
@@ -371,21 +366,15 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
             fp_input >> Rgrid[iR];
             for (int eps=0; eps<contstate[ind].NE; eps++)
             {
-                // complexd dip = (0,0);
                 for (int L=0; L<=lmax; L++)
                 {
                     int M1=( L<=mmax ? L : mmax);
                     for (int M=-M1; M<=M1; M++)
                     {
-                        // cout << "iR: " << iR << endl;              // DEBUG
-                        // cout << "eps: " << eps << endl;            // DEBUG
-                        // cout << "l: " << L << " m: " << M << endl; // DEBUG
                         complexd x,y,z; fp_input >> x >> y >> z;
-                        // cout << x << " " << y << " " << z << endl; // DEBUG
                         if(Ej<bar)        (contstate[ind].DIPpump)[Ej][eps][SpH(L,M,mmax)][0]      = x*u1[0]+y*u1[1]+z*u1[2];
                         else if(bar == 0) (contstate[ind].DIPprobe)[Ej][eps][SpH(L,M,mmax)][0]     = x*u2[0]+y*u2[1]+z*u2[2];
                         else              (contstate[ind].DIPprobe)[bar-Ej][eps][SpH(L,M,mmax)][0] = x*u2[0]+y*u2[1]+z*u2[2];
-                        // cout << "Ej: " << Ej << " eps: " << eps << " lm: " << SpH(L,M,mmax) << " " << x << " " << y << " " << z << endl;
                     }
                 }
             }
@@ -455,7 +444,7 @@ void Read_Decays(ifstream& fp_input,vec1d& Gamma, int NEi)
         printf("For state %d the decay width is: %3.4f eV -> Lifetime: %3.4f fs\n",Ei,Gamma[Ei],0.659/Gamma[Ei]);
         Gamma[Ei]*=energy_eV_au; //we convert it from eV to a.u.
     }
-}//End Read_PES
+}//End Read_Decays
 
 
 

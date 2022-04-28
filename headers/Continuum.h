@@ -32,7 +32,7 @@ int spH(int l, int m, int mmax){
 
 class Continuum{
 private:
-	void load_UniqueStates(){
+	void load_UniqueStates(){ // Create an array with non repeated elements of indexes of coupling
 		UniqueStates.insert(UniqueStates.begin(), StatCouplPump.begin(), StatCouplPump.end());
     	UniqueStates.insert(UniqueStates.end(), StatCouplProbe.begin(), StatCouplProbe.end());
 		sort(UniqueStates.begin(),UniqueStates.end());
@@ -48,17 +48,14 @@ public:
 	}
 	vector<string> DIPpath;         // Continuum Dipole Moments Path (First the ones coupled with Pump, then Probe)
 	string PESpath;                 // Double core-hole energies Path
-	
 	vector<int> StatCouplPump;      // Bound states that couples with Pump from input
 	vector<int> StatCouplProbe;     // Bound states that couples with Probe from input
-	vector<int> UniqueStates;
-	// vector<int> CommonStates;    // States that couples with both Pump and Probe
+	vector<int> UniqueStates;		// Indexes of couplings non repeated
 	vector<vector<int>> Indexes;	// Indexes of couplings
 	vector<vector<bool>> Allow;	    // Allowance of couplings
 	vector<double> PES;	            // Double-core hole energies
-	double Gamma;	                // Decays for each coupling
-	double Population = 0.0;
-	vector<double> E;
+	double Gamma;	                // Double-core hole state decay
+	vector<double> E;				// Array containing the
 	double Emax;
 	double Emin;
 	double dE;
@@ -70,21 +67,19 @@ public:
 	vec4x DIPpump;					// Dipoles that couple with pump laser
 	vec4x DIPprobe;                 // Dipoles that couple with probe pulse
 	// Runge-Kutta variables
-	vec3x Vte;
-	vec3x bev;
-	vec3x be;
-	vec3x be1;
-	vec3x be2;
-	void load_E(){
+	vec3x Vte;						// Dipole term
+	vec3x bev;						// Derivative term
+	vec3x be;						// Continuum amplitude
+	vec3x be1;						// Aux1 variable
+	vec3x be2;						// Aux2 variable
+	void load_E(){ // It calculates the whole range of Continuum energies
 		vector<double> v(NE);
 		E = v;
 		for(int i=0;i<NE;i++){
 			E[i] = (Emin + double(i)*dE);
-			// E[i] = (-20. * energy_eV_au + double(i)*dE);
-			// cout << E[i] << " " << E[i]*energy_au_eV << endl;
 		}
 	}
-	void load_RKvariables(int& NEps, int& NR, int& lm){
+	void load_RKvariables(int& NEps, int& NR, int& lm){// Initializing RK variables
 		load_UniqueStates();
 		vec3x v(NEps,vec2x(lm,vec1x(NR,complexd(0,0))));
 		Vte = v;
@@ -93,14 +88,14 @@ public:
 		be1 = v;
 		be2 = v;
 	}
-	void load_DIP(int& NEj, int& NEps, int& NR, int& lm, vec4x& DIP){  // Gives dimensionality to DIP array   
+	void load_DIP(int& NEj, int& NEps, int& NR, int& lm, vec4x& DIP){  // Initializing DIP array   
 		vec4x v(NEj,vec3x(NEps,vec2x(lm,vec1x(NR,complexd(0,0))))); // Dimension[NEj][NEps][l/m][R] (R has to be the last to interpolate it better)
 		DIP = v;
 	}
-	void load_PES(int& NR){  // Gives dimensionality to PES array   
+	void load_PES(int& NR){  // Initializing PES array   
 		PES.resize(NR);
 	}
-	void positionEj(){ // I can compress the code by looping the pulses, but that way is a bit faster
+	void positionEj(){ // It organizes couplings indexes and makes a boolean matrix to indicate allowance of coupligs in each pulse
 		int max1 = (StatCouplPump.size() > 0) ? *max_element(StatCouplPump.begin(), StatCouplPump.end()) : 0;
 		int max2 = (StatCouplProbe.size() > 0) ? *max_element(StatCouplProbe.begin(), StatCouplProbe.end()) : 0;
 		maxBoundState = max(max1,max2); // max bound state to construct a matrix with size: 2 x max1  
@@ -143,31 +138,3 @@ public:
 /*
 If we want to use circularly polarized laser, we should increase dimension to DIP vectors by separating x, y and z components
 */
-
-		// void statesINcommon(){ // Use it after reading dipoles
-	// 	vector<int> v(StatCouplPump.size()+StatCouplProbe.size());
-	// 	vector<int>::iterator it, common;
-	// 	it = set_intersection(StatCouplPump.begin(), StatCouplPump.end(), StatCouplProbe.begin(), StatCouplProbe.end(), v.begin());
-	// 	for(common = v.begin(); common != it; ++common) CommonStates.push_back(*common);
-	// 	for(int i=0;i<CommonStates.size();i++){
-	// 		for(int j=0;j<StatCouplPump.size();j++){
-	// 			if(CommonStates[i]==StatCouplPump[j]) StatCouplPump.erase(StatCouplPump.begin()+j);
-	// 		}
-	// 		for(int k=0;k<StatCouplProbe.size();k++){
-	// 			if(CommonStates[i]==StatCouplProbe[k]) StatCouplProbe.erase(StatCouplProbe.begin()+k);
-	// 		}
-	// 	}
-	// }
-	// void check_DIP(int& Ej, vector<int>& StatCoupl, double *allow, int *ind){
-	// 	for(int i=0;i<StatCoupl.size();i++){
-	// 		if(StatCoupl[i]==Ej){
-	// 			*ind = i;
-	// 			*allow = 1.0;
-	// 			break;
-	// 		}
-	// 		else{
-	// 			*ind = 0;
-	// 			*allow = 0.0;
-	// 		}
-	// 	}
-	// }
