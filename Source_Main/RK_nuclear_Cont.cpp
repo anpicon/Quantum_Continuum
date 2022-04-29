@@ -4,7 +4,7 @@
         //------ 1st step Runge-Kutta
         EF1=pulse1.Gaussian(ncyc*sigma1,sigma1,time);
         EF2=pulse2.Gaussian(ncyc*sigma1+DELAY,sigma2,time);
-        Runge_Kutta_Df_fixed_Cont(b0,EF1,EF2,ArrayCont,0);
+        Runge_Kutta_Df_Cont(b0,EF1,EF2,ArrayCont,0);
         Runge_Kutta_Ad_Cont(dt6,ArrayCont,1);
         Runge_Kutta_Ad_Cont(dt2,ArrayCont,2);
         
@@ -13,7 +13,7 @@
         EF1=pulse1.Gaussian(ncyc*sigma1,sigma1,time);
         EF2=pulse2.Gaussian(ncyc*sigma1+DELAY,sigma2,time);
        
-        Runge_Kutta_Df_fixed_Cont(b2,EF1,EF2,ArrayCont,1);
+        Runge_Kutta_Df_Cont(b2,EF1,EF2,ArrayCont,1);
         Runge_Kutta_Ac_Cont(dt3,ArrayCont);
         Runge_Kutta_Ad_Cont(dt2,ArrayCont,2);
 
@@ -27,5 +27,5 @@
         EF1=pulse1.Gaussian(ncyc*sigma1,sigma1,time);
         EF2=pulse2.Gaussian(ncyc*sigma1+DELAY,sigma2,time);
         
-        Runge_Kutta_Df_fixed_Cont(b2,EF1,EF2,ArrayCont,1);
+        Runge_Kutta_Df_Cont(b2,EF1,EF2,ArrayCont,1);
         Runge_Kutta_Ad_Cont(dt6,ArrayCont,3);
