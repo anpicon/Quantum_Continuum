@@ -1,4 +1,6 @@
-
+        dt2=(dt/2.0);
+        dt3=(dt/3.0);
+        dt6=(dt/6.0);
         //------ 1st step Runge-Kutta
         EF1=pulse1.Gaussian(ncyc*sigma1,sigma1,time);
         EF2=pulse2.Gaussian(ncyc*sigma1+DELAY,sigma2,time);
@@ -7,7 +9,9 @@
         Runge_Kutta_Ad(b0,b2,bv,dt2,ArrayCont,2);
         
         //------ 2nd step Runge-Kutta
-        time=it*dt+dt2;
+        // time=it*dt+dt2;
+        time=it*dt+(dt/2.0);
+        //cout << "it: " << it << " dt: " << dt << " dt2: " << dt2 << "1: " << time << endl;
         EF1=pulse1.Gaussian(ncyc*sigma1,sigma1,time);
         EF2=pulse2.Gaussian(ncyc*sigma1+DELAY,sigma2,time);
        
@@ -22,6 +26,7 @@
 
         //------ 4th step Runge-Kutta
         time=(it+1)*dt;
+        //cout << "it: " << it << " dt: " << dt << "2: " << time << endl;
         EF1=pulse1.Gaussian(ncyc*sigma1,sigma1,time);
         EF2=pulse2.Gaussian(ncyc*sigma1+DELAY,sigma2,time);
         

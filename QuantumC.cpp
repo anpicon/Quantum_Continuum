@@ -130,11 +130,13 @@ int main (int argc, char* argv[])
             PrintEF(fp_EF,EF1,EF2,time);
             icont++;
         }
+        // Include if(ArrayCont.size()>0)
         if (NR>1) {
             #include "Source_Main/RK_nuclear.cpp"
         }
         else {
             #include "Source_Main/RK_fixed.cpp"
+            #include "Source_Main/RK_fixed_Cont.cpp"
         }
         
     }//--------- END TIME LOOP
