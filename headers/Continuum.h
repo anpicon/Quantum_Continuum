@@ -11,7 +11,7 @@ typedef vector<double>                          vec1d;
 typedef vector<vec1d>                           vec2d;
 typedef vector<vec2d>                           vec3d;
 
-//Notation for saving spherical harmonic basis
+// Notation for saving spherical harmonic basis
 int spH(int l, int m, int mmax){
     int A=0;
     if (l<=mmax) {
@@ -72,6 +72,7 @@ public:
 	vec3x be;						// Continuum amplitude
 	vec3x be1;						// Aux1 variable
 	vec3x be2;						// Aux2 variable
+	vec2x dip_BS;					// Dipole term that removes population from Bound States
 	void load_E(){ // It calculates the whole range of Continuum energies
 		vector<double> v(NE);
 		E = v;
@@ -82,11 +83,13 @@ public:
 	void load_RKvariables(int& NEps, int& NR, int& lm){// Initializing RK variables
 		load_UniqueStates();
 		vec3x v(NEps,vec2x(lm,vec1x(NR,complexd(0,0))));
+		vec2x w(UniqueStates.size(),vec1x(NR,complexd(0,0)));
 		Vte = v;
 		bev = v;
 		be  = v;
 		be1 = v;
 		be2 = v;
+		dip_BS = w;
 	}
 	void load_DIP(int& NEj, int& NEps, int& NR, int& lm, vec4x& DIP){  // Initializing DIP array   
 		vec4x v(NEj,vec3x(NEps,vec2x(lm,vec1x(NR,complexd(0,0))))); // Dimension[NEj][NEps][l/m][R] (R has to be the last to interpolate it better)

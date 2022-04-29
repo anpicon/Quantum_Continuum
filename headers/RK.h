@@ -45,21 +45,47 @@ double kintf(int iR) //NOTE: we need to include dR in the input file and transfe
 }
  */
 
-void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2)
+void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d& Dip1,vec3d& Dip2, vec1d& Gamma, double& EF1, double& EF2,vec1C& ArrayCont)
 
 {
-    int NEi = PES.size();
+    if(ArrayCont.size()>0){
+        for(int i=0;i<ArrayCont.size();i++){
+            int NEi = PES.size();
     
-//#pragma omp parallel for schedule(dynamic) default(shared) -- it causes a problem due to Vt array, we should use Vt[Ei][iR]
-    for (int Ei=0; Ei<NEi; Ei++)
-    {
-        fill(Vt.begin(), Vt.end(), 0.);
-        
-        for (int Ej=0; Ej<NEi; Ej++)
-        {
-            Vt[0]+=c1*(Dip1[Ei][Ej][0]*EF1+Dip2[Ei][Ej][0]*EF2)*bgs[Ej][0];
+            //#pragma omp parallel for schedule(dynamic) default(shared) -- it causes a problem due to Vt array, we should use Vt[Ei][iR]
+            complexd dipCont;
+            for (int Ei=0; Ei<NEi; Ei++)
+            {
+                fill(Vt.begin(), Vt.end(), 0.);
+                for (int Ej=0; Ej<NEi; Ej++)
+                {
+                    Vt[0]+=c1*(Dip1[Ei][Ej][0]*EF1+Dip2[Ei][Ej][0]*EF2)*bgs[Ej][0];
+                }
+                for(auto dip:ArrayCont[i].UniqueStates){
+                    if(Ei==dip){
+                        dipCont = ArrayCont[i].dip_BS[ArrayCont[i].Indexes[0][dip]][0];
+                        break;
+                    }
+                    else dipCont = 0.0;
+                }
+                bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0] - dipCont;
+            }
         }
-        bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0];
+    }
+    else{
+        int NEi = PES.size();
+    
+        //#pragma omp parallel for schedule(dynamic) default(shared) -- it causes a problem due to Vt array, we should use Vt[Ei][iR]
+        complexd dipCont;
+        for (int Ei=0; Ei<NEi; Ei++)
+        {
+            fill(Vt.begin(), Vt.end(), 0.);
+            for (int Ej=0; Ej<NEi; Ej++)
+            {
+                Vt[0]+=c1*(Dip1[Ei][Ej][0]*EF1+Dip2[Ei][Ej][0]*EF2)*bgs[Ej][0];
+            }
+            bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0];
+        }
     }
 }
 
