@@ -29,3 +29,6 @@
         
         Runge_Kutta_Df_Cont(b2,EF1,EF2,ArrayCont,1);
         Runge_Kutta_Ad_Cont(dt6,ArrayCont,3);
+
+        // ----- Calculates cont amplituds at the end of each step
+        Calculate_Cont_Ampl(EF1, EF2, ArrayCont);

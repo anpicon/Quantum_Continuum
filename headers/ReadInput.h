@@ -538,31 +538,6 @@ void fcontinuum(ifstream& fp_input, vec1s& path,string& s,vector<string>& str, s
                 exit(1);
             }
         }//end dE
-       else if( 0 ==strcasecmp(str[0].c_str(), "BE") )
-        {   
-            int i;
-            for(i=0;i<(NPump+NProbe);i++){
-                (contstate[ind].BE).push_back(atof(str[i+1].c_str()));
-                cout << i+1 << endl;
-            }
-            if(str.size() < NPump+NProbe)
-            {
-                continue;
-            }
-            else if(0 ==strcasecmp(str[i+1].c_str(), "eV"))
-            {
-                for(int i=0;i<(NPump+NProbe);i++) contstate[ind].BE[i] *= energy_eV_au;
-            }
-            else if(0 ==strcasecmp(str[i+1].c_str(), "au") || (0 ==strcasecmp(str[i+1].c_str(), "atomicunit")))
-            {
-                continue;
-            }
-            else
-            {
-                printf("Units %s aren't allowed for BE.\n", str[i+1].c_str());
-                exit(1);
-            }
-        }//end E_BE
         else if( 0 ==strcasecmp(str[0].c_str(), "Lmax") )
         {
             contstate[ind].Lmax=atof(str[1].c_str());
@@ -662,5 +637,5 @@ void Read_Input(ifstream& fp_input,double& dt, string& iInitialState, int& NR,do
             }
         }
     } //end while
-    printf("  done \n");
+    printf("Input Read \n");
 } //end read_input

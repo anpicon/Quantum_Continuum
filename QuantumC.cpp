@@ -89,7 +89,7 @@ int main (int argc, char* argv[])
     {
         if ( it %  (nstep/10) == 0)         printf("Step # %5d             ---------->  %3.2f %% \n", it, it*100./nstep);
         double time=it*dt;
-        
+        // cout << "Continuum Array size: " << ArrayCont.size() << endl;
         //----- Print Electric Fields and Amplitudes
         // sum of the probability, shoud be one
         if(time>=icont*contador)
@@ -119,6 +119,10 @@ int main (int argc, char* argv[])
             }
             if (iObservables[2])
             {
+                if(ArrayCont.size()==0){
+                    cout << "Continuum XPS cannot be calculated\n";
+                    exit(1);
+                }
                 string name_file; stringstream sname;
                 sname.seekp(0,ios::beg); sname << icont;
                 name_file= "Output/XPS/xps_" + sname.str() + ".txt";

@@ -2,7 +2,6 @@
 
 void Runge_Kutta_Df_fixed_Cont(vec2x& bgs, double& EF1, double& EF2, vec1C& ArrayCont,int ContMode)
 {
-    int count;
     complexd pulse1, pulse2;
     for(int i=0;i<ArrayCont.size();i++){      
         int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
@@ -17,7 +16,6 @@ void Runge_Kutta_Df_fixed_Cont(vec2x& bgs, double& EF1, double& EF2, vec1C& Arra
                     {
                         lm = spH(L,M,mmax);
                         fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
-                        count=0;
                         for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
                             if(ArrayCont[i].Allow[0][j] == 1){
                                 pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
@@ -28,9 +26,7 @@ void Runge_Kutta_Df_fixed_Cont(vec2x& bgs, double& EF1, double& EF2, vec1C& Arra
                                 pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][0]*EF2;
                             }
                             else pulse2 = (0,0);
-                            ArrayCont[i].dip_BS[count][0] +=c1*(pulse1 + pulse2)*ArrayCont[i].be[eps][lm][0]*ArrayCont[i].dE;
                             ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
-                            count++;
                         }
                         ArrayCont[i].bev[eps][lm][0] = (-c1*(ArrayCont[i].PES[0]+ArrayCont[i].E[eps])- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
                     }
@@ -38,7 +34,6 @@ void Runge_Kutta_Df_fixed_Cont(vec2x& bgs, double& EF1, double& EF2, vec1C& Arra
             }
         }
         else{
-            int count;
             for (int eps=0; eps<ArrayCont[i].NE; eps++)
             {
                 for (int L=0; L<=ArrayCont[i].Lmax; L++)
@@ -48,7 +43,6 @@ void Runge_Kutta_Df_fixed_Cont(vec2x& bgs, double& EF1, double& EF2, vec1C& Arra
                     {
                         lm = spH(L,M,mmax);
                         fill(ArrayCont[i].Vte[eps][lm].begin(), ArrayCont[i].Vte[eps][lm].end(), 0.); // Reset summatory to 0
-                        count=0;
                         for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
                             if(ArrayCont[i].Allow[0][j] == 1){
                                 pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
@@ -59,9 +53,7 @@ void Runge_Kutta_Df_fixed_Cont(vec2x& bgs, double& EF1, double& EF2, vec1C& Arra
                                 pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][0]*EF2;
                             }
                             else pulse2 = (0,0);
-                            ArrayCont[i].dip_BS[count][0] +=c1*(pulse1 + pulse2)*ArrayCont[i].be[eps][lm][0]*ArrayCont[i].dE;
                             ArrayCont[i].Vte[eps][lm][0]+=c1*(pulse1 + pulse2)*bgs[j][0]; // Now it has only one state (1x0 matrix)
-                            count++;
                         }
                         ArrayCont[i].bev[eps][lm][0] = (-c1*(ArrayCont[i].PES[0]+ArrayCont[i].E[eps])- 0.5*ArrayCont[i].Gamma)*ArrayCont[i].be2[eps][lm][0] - ArrayCont[i].Vte[eps][lm][0];
                     }
@@ -286,6 +278,42 @@ void Runge_Kutta_Ad_Cont(double& dt, vec1C& ArrayCont, int ContMode)
                             lm = spH(L,M,mmax);
                             ArrayCont[i].be[eps][lm][0] = ArrayCont[i].be1[eps][lm][0] + ArrayCont[i].bev[eps][lm][0]*dt;
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Calculate_Cont_Ampl(double& EF1, double& EF2,vec1C& ArrayCont){
+    int NR = ArrayCont[0].Vte[0][0].size();
+    int count =0;
+    complexd pulse1, pulse2;
+    for(int i=0;i<ArrayCont.size();i++){      
+        int mmax = ArrayCont[i].Mmax; // As I call it several times, it will be faster to have it in a local variable
+        int lm; // As I call it several times, it will be faster to have it in a local variable
+        ArrayCont[i].load_dip_BS(NR); // Reset summatory
+        for (int eps=0; eps<ArrayCont[i].NE; eps++)
+        {
+            for (int L=0; L<=ArrayCont[i].Lmax; L++)
+            {
+                int M1=( L<=mmax ? L : mmax);
+                for (int M=-M1; M<=M1; M++)
+                {
+                    lm = spH(L,M,mmax);
+                    count=0;
+                    for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
+                        if(ArrayCont[i].Allow[0][j] == 1){
+                            pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
+                        }
+                        else pulse1 = (0,0);
+
+                        if(ArrayCont[i].Allow[1][j] == 1){
+                            pulse2 = (ArrayCont[i].DIPprobe)[ArrayCont[i].Indexes[1][j]][eps][lm][0]*EF2;
+                        }
+                        else pulse2 = (0,0);
+                        ArrayCont[i].dip_BS[count][0] +=c1*(pulse1 + pulse2)*ArrayCont[i].be[eps][lm][0]*ArrayCont[i].dE;
+                        count++;
                     }
                 }
             }

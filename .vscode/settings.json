@@ -6,6 +6,7 @@
         "complex": "cpp",
         "string": "cpp",
         "ostream": "cpp",
-        "istream": "cpp"
+        "istream": "cpp",
+        "array": "cpp"
     }
 }

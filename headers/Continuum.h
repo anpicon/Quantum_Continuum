@@ -59,7 +59,6 @@ public:
 	double Emax;
 	double Emin;
 	double dE;
-	vector<double> BE;              // Binding Energy
 	int maxBoundState;              // Index of the maximum bound state coupled
 	int    Lmax;
 	int    Mmax;
@@ -89,6 +88,11 @@ public:
 		be  = v;
 		be1 = v;
 		be2 = v;
+		dip_BS = w;
+	}
+	void load_dip_BS(int& NR){
+		load_UniqueStates();
+		vec2x w(UniqueStates.size(),vec1x(NR,complexd(0,0)));
 		dip_BS = w;
 	}
 	void load_DIP(int& NEj, int& NEps, int& NR, int& lm, vec4x& DIP){  // Initializing DIP array   
