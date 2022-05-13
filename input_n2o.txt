@@ -1,0 +1,56 @@
+
+molecule {
+name N2O 
+}
+
+tdse {
+dt 0.001 au
+NR 1
+tf 6.0 fs
+}
+
+electronicstates {
+NEi 3
+PESpath INPUTS/energy_tdse.txt
+DECAYSpath INPUTS/decays_tdse.txt
+DIPpath INPUTS/dipoles_tdse.txt
+}
+
+continuumstate {
+NCoupledPump 0
+WhichStatPump 0 0  # Ej states will be ordered by the number of bound state that they interact with
+NCoupledProbe 2
+WhichStatProbe 1 2
+Emax 416.0 eV
+Emin 376.0 eV
+dE 0.1 eV
+Gamma 0.0 eV
+Lmax 2
+Mmax 2
+PESpath INPUTS/energies_continuum0.txt #Double core-hole energy
+DIPpath INPUTS/dipoles_continuumNt.txt INPUTS/dipoles_continuumNc.txt
+DECAYSpath INPUTS/decays_continuum0.txt
+}
+
+
+laserpump {
+envelope gaussian
+sigma 0.2 fs      
+frequency 403 eV
+intensity 1.e+18 wcm2
+polarization 0 0 1                   
+}
+
+laserprobe {
+envelope gaussian
+sigma 0.2 fs      
+frequency 806 eV
+intensity 1.e+18 wcm2
+polarization 0 0 1
+DELAY 0.75 fs
+}
+
+observables {
+amplitudes
+xps
+}
