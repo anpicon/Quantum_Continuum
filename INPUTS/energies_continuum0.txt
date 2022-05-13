@@ -1,4 +1,4 @@
 #NR 1
 
 R E
-1. -154.46870266
+1. 29.858153420 #Relative energy(absolute energy is: -154.46870266, so we substract GS Energy)
