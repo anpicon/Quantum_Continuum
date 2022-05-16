@@ -11,7 +11,7 @@
 #include <armadillo>
 
 #include "omp.h"
-#include "Tricubic3.h"
+// #include "Tricubic3.h"
 #include "Constants.h"
 #include "typedef.h"
 #include "Laser.h"

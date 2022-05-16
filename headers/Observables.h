@@ -37,20 +37,13 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& 
     if(ArrayCont.size()>0){     
         for(int i=0;i<ArrayCont.size();i++){ 
             double ContPopulation =0.0;     
-            int mmax = ArrayCont[i].Mmax;
-            int lm;
             for (int iR=0; iR<NR; iR++)
             {
                 for (int eps=0; eps<ArrayCont[i].NE; eps++)
                 {
-                    for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                    for(auto lm: ArrayCont[i].lm)
                     {
-                        int M1=( L<=mmax ? L : mmax);
-                        for (int M=-M1; M<=M1; M++)
-                        {
-                            lm = spH(L,M,mmax);
-                            ContPopulation += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
-                        }
+                        ContPopulation += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
                     }
                 }
             }
@@ -68,20 +61,13 @@ void PrintXPS(ofstream& fp_xps, double time, vec1C& ArrayCont){
     int NR=ArrayCont[0].PES.size();
     for(int i=0;i<ArrayCont.size();i++){ 
         vector <double> XPS(ArrayCont[i].NE,0.0);     
-        int mmax = ArrayCont[i].Mmax;
-        int lm;
         for (int iR=0; iR<NR; iR++)
         {
             for (int eps=0; eps<ArrayCont[i].NE; eps++)
             {
-                for (int L=0; L<=ArrayCont[i].Lmax; L++)
+                for(auto lm: ArrayCont[i].lm)
                 {
-                    int M1=( L<=mmax ? L : mmax);
-                    for (int M=-M1; M<=M1; M++)
-                    {
-                        lm = spH(L,M,mmax);
-                        XPS[eps] += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
-                    }
+                    XPS[eps] += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
                 }
                 fp_xps << (ArrayCont[i].Emin + ArrayCont[i].dE*double(eps))*energy_au_eV;
                 fp_xps << " " << XPS[eps] << endl;

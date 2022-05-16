@@ -11,25 +11,6 @@ typedef vector<double>                          vec1d;
 typedef vector<vec1d>                           vec2d;
 typedef vector<vec2d>                           vec3d;
 
-// Notation for saving spherical harmonic basis
-int spH(int l, int m, int mmax){
-    int A=0;
-    if (l<=mmax) {
-        for (int j=0; j<l; j++) A+=(2*j+1);
-        A--;
-        if (m==0) A+=l+1;
-        else A+=l+1+m;
-    }
-    else {
-        for (int j=0; j<=mmax; j++) A+=(2*j+1);
-        for (int j=mmax+1; j<l; j++) A+=(2*mmax+1);
-        A--;
-        if (m==0) A+=mmax+1;
-        else A+=mmax+1+m;
-    }
-    return A;
-}
-
 class Continuum{
 private:
 	void load_UniqueStates(){ // Create an array with non repeated elements of indexes of coupling
@@ -62,6 +43,7 @@ public:
 	int maxBoundState;              // Index of the maximum bound state coupled
 	int    Lmax;
 	int    Mmax;
+	vector<int> lm;
 	int    NE;                      // Number of energies: we define it after having Emax,Emin and dE values NE=int((Emax-Emin)/dE)
 	vec4x DIPpump;					// Dipoles that couple with pump laser
 	vec4x DIPprobe;                 // Dipoles that couple with probe pulse
@@ -130,6 +112,7 @@ public:
 			for(int Ei=0;Ei<StatCouplProbe.size();Ei++){
 				if(j==StatCouplProbe[Ei]){
 					Indexes[1].push_back(Ei);
+					cout << Ei << endl;
 					Allow[1].push_back(1);
 					check=1;
 				}
@@ -139,6 +122,19 @@ public:
 				Allow[1].push_back(0);
 			}
 		}
+	}
+	void load_sphVec(){
+		int count = 0;
+		if(Lmax==Mmax) for(int i=0; i<((Lmax+1)*(Lmax+1)); i++) lm.push_back(count++);
+		else{
+			for(int i=0;i<Lmax+1;i++){
+				if(i<=Mmax) for(int j=-i;j<=i;j++) lm.push_back(count++);
+				else for(int j=-Mmax;j<=Mmax;j++) lm.push_back(count++);
+    		}
+		}
+		cout << "VECTORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR" << endl;
+		for(auto a:lm) cout << a << " ";
+		cout << endl;
 	}
 };
 

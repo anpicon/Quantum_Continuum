@@ -42,6 +42,7 @@ fp_input.close();
 // Continuum states part
 if(NContStat>=0){
     for(int i=0;i<=NContStat;i++){
+        ArrayCont[i].load_sphVec(); // Initialize l and m quantum numbers vector
         fp_input.open((ArrayCont[i].PESpath).c_str()); // Read double core-hole states
         Read_Cont_PES(fp_input, ArrayCont, i, PES);
         cout << "Read PES of Continuum State " << i << endl;

@@ -6,7 +6,8 @@
  *
  */
 
-#include "tk_spline.h"
+// #include "tk_spline.h"
+#include "Interpolation.h"
 #include "Continuum.h"
 
 //Notation for saving spherical harmonic basis
@@ -84,14 +85,21 @@ void Read_PES(ifstream& fp_input,vec1d& R, vec2d& PESi)
         }
         printf("Energies have been shifted by the minimum energy of the ground state: Eshift=%3.5f a.u.\n", Eshift);
         //Starting the interpolation for a finer nuclear grid
-        tk::spline s;
+        // tk::spline s;
         for (int Ei=0; Ei<NEi; Ei++)
         {
-            s.set_points(Rgrid,PES[Ei]);
+            int NE = PES[Ei].size();
+            vec3d PES3D(1,vec2d(1,vec1d(NE,0.)));
+            for (int i=0; i<NE; i++) PES3D[0][0][i] = PES[Ei][i];
+            vec1d spacings(3); spacings[0]=0.; spacings[1]=0.; spacings[2]= Rgrid[1]-Rgrid[0];
+            vec1d Origin(3); Origin[0]=0.; Origin[1]=0.; Origin[2]= Rgrid[0];
+            FittedDataREAL s(PES3D,spacings,Origin);
+            // s.set_points(Rgrid,PES[Ei]);
             for (int iR=0; iR<NRi; iR++)
             {
                 double x=Rgrid[0]+iR*(Rgrid[NR-1]-Rgrid[0])/(NRi-1);
-                PESi[Ei][iR]=s(x);
+                // PESi[Ei][iR]=s(x);
+                PESi[Ei][iR]=s(0,0,x);
                 R[iR]=x;
             }
         }
@@ -208,19 +216,29 @@ void Read_Dipoles(ifstream& fp_input,vec3d& Dip1i,vec3d& Dip2i,vec1d& u1,vec1d& 
         }
 
         //Starting the interpolation for a finer nuclear grid
-        tk::spline s1;
-        tk::spline s2;
+        // tk::spline s1;
+        // tk::spline s2;
         for (int Ei=0; Ei<NEi; Ei++)
         {
             for (int Ej=Ei+1; Ej<NEi; Ej++)
             {
-                s1.set_points(Rgrid,Dip1[Ei][Ej]);
-                s2.set_points(Rgrid,Dip2[Ei][Ej]);
+                int N1 = Dip1[Ei][Ej].size();
+                int N2 = Dip2[Ei][Ej].size();
+                vec3d Dip13D(1,vec2d(1,vec1d(N1,0.)));
+                vec3d Dip23D(1,vec2d(1,vec1d(N2,0.)));
+                for (int i=0; i<N1; i++) Dip13D[0][0][i] = Dip1[Ei][Ej][i];
+                for (int i=0; i<N2; i++) Dip23D[0][0][i] = Dip2[Ei][Ej][i];
+                vec1d spacings(3); spacings[0]=0.; spacings[1]=0.; spacings[2]= Rgrid[1]-Rgrid[0];
+                vec1d Origin(3); Origin[0]=0.; Origin[1]=0.; Origin[2]= Rgrid[0];
+                FittedDataREAL s1(Dip13D,spacings,Origin);
+                FittedDataREAL s2(Dip13D,spacings,Origin);
+                // s1.set_points(Rgrid,Dip1[Ei][Ej]);
+                // s2.set_points(Rgrid,Dip2[Ei][Ej]);
                 for (int iR=0; iR<NRi; iR++)
                 {
                     double x=Rgrid[0]+iR*(Rgrid[NR-1]-Rgrid[0])/(NRi-1);
-                    Dip1i[Ei][Ej][iR]=s1(x);
-                    Dip2i[Ei][Ej][iR]=s2(x);
+                    Dip1i[Ei][Ej][iR]=s1(0,0,x);
+                    Dip2i[Ei][Ej][iR]=s2(0,0,x);
                 }
             }
         }
@@ -351,7 +369,7 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
     if(Ej==0){
         int sizepump = (contstate[ind].StatCouplPump).size();
         int sizeprobe = (contstate[ind].StatCouplProbe).size();
-        int lm= SpH(lmax,mmax,mmax)+1;
+        int lm= *max_element(contstate[ind].lm.begin(), contstate[ind].lm.end()) + 1;
         contstate[ind].load_DIP(sizepump, contstate[ind].NE, NR, lm, contstate[ind].DIPpump); // Give dimension DIP Pump
         contstate[ind].load_DIP(sizeprobe, contstate[ind].NE, NR, lm, contstate[ind].DIPprobe); // Give dimension DIP Probe
         contstate[ind].load_E(); // Load Continuum photoelectron energies
@@ -366,16 +384,13 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
             fp_input >> Rgrid[iR];
             for (int eps=0; eps<contstate[ind].NE; eps++)
             {
-                for (int L=0; L<=lmax; L++)
+                for(auto lm: contstate[ind].lm)
                 {
-                    int M1=( L<=mmax ? L : mmax);
-                    for (int M=-M1; M<=M1; M++)
-                    {
+                        // cout << SpH(L,M,mmax) << endl;
                         complexd x,y,z; fp_input >> x >> y >> z;
-                        if(Ej<bar)        (contstate[ind].DIPpump)[Ej][eps][SpH(L,M,mmax)][0]      = x*u1[0]+y*u1[1]+z*u1[2];
-                        else if(bar == 0) (contstate[ind].DIPprobe)[Ej][eps][SpH(L,M,mmax)][0]     = x*u2[0]+y*u2[1]+z*u2[2];
-                        else              (contstate[ind].DIPprobe)[bar-Ej][eps][SpH(L,M,mmax)][0] = x*u2[0]+y*u2[1]+z*u2[2];
-                    }
+                        if(Ej<bar)        (contstate[ind].DIPpump)[Ej][eps][lm][0]      = x*u1[0]+y*u1[1]+z*u1[2];
+                        else if(bar == 0) (contstate[ind].DIPprobe)[Ej][eps][lm][0]     = x*u2[0]+y*u2[1]+z*u2[2];
+                        else              (contstate[ind].DIPprobe)[bar-Ej][eps][lm][0] = x*u2[0]+y*u2[1]+z*u2[2];
                 }
             }
         }
