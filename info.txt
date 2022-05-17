@@ -1,3 +1,4 @@
 TO DO:
 - Read dipoles NR > 1
+- Apply interpolation
 - Dipole contribution in RK_Df from the continuum (fix pump-probe)

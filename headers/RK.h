@@ -52,7 +52,7 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
         for(int i=0;i<ArrayCont.size();i++){
             int NEi = PES.size();
     
-            #pragma omp parallel for
+            // #pragma omp parallel for
             for (int Ei=0; Ei<NEi; Ei++)
             {
                 // cout << "Eiiiiiiiii: "<< Ei << endl;

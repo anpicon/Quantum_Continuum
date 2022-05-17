@@ -184,7 +184,7 @@ void Runge_Kutta_Ad_Cont(double& dt, vec1C& ArrayCont, int ContMode)
     else{    
         for(int i=0;i<ArrayCont.size();i++){          
             if(ContMode==1){ // If here much faster than inside the other loops
-                // #pragma omp parallel for
+                #pragma omp parallel for
                 for (int eps=0; eps<ArrayCont[i].NE; eps++)
                 {
                     for(auto lm: ArrayCont[i].lm)
@@ -194,7 +194,7 @@ void Runge_Kutta_Ad_Cont(double& dt, vec1C& ArrayCont, int ContMode)
                 }
             }
             else if(ContMode==2){
-                // #pragma omp parallel for
+                #pragma omp parallel for
                 for (int eps=0; eps<ArrayCont[i].NE; eps++){
                     for(auto lm: ArrayCont[i].lm)
                     {
@@ -203,7 +203,7 @@ void Runge_Kutta_Ad_Cont(double& dt, vec1C& ArrayCont, int ContMode)
                 }
             }
             else{
-                // #pragma omp parallel for
+                #pragma omp parallel for
                 for (int eps=0; eps<ArrayCont[i].NE; eps++){
                     for(auto lm: ArrayCont[i].lm)
                     {
@@ -216,18 +216,19 @@ void Runge_Kutta_Ad_Cont(double& dt, vec1C& ArrayCont, int ContMode)
 }
 
 void Calculate_Cont_Ampl(double& EF1, double& EF2,vec1C& ArrayCont){
-    int NR = ArrayCont[0].Vte[0][0].size();
-    for(int i=0;i<ArrayCont.size();i++){      
+    for(int i=0;i<ArrayCont.size();i++){  
+        int NR = ArrayCont[i].Vte[0][0].size();    
         ArrayCont[i].load_dip_BS(NR); // Reset summatory
-        int count =0;
+        // int count =0;
         for (int iR=0; iR<NR; iR++) // CHANGE CONTMODE BEFORE THAT LOOP FOR INCREASING VELOCITY
         {
+            // #pragma omp parallel for
             for (int eps=0; eps<ArrayCont[i].NE; eps++)
             {
                 complexd pulse1, pulse2;
                 for(auto lm: ArrayCont[i].lm)
                 {
-                    count=0;
+                    int count=0;
                     for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
                         if(ArrayCont[i].Allow[0][j] == 1){
                             pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
