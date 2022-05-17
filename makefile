@@ -1,6 +1,6 @@
 CXX = g++ #gcc-mp-8
 CXXFLAGS = -ansi -std=c++14 -pg #-W -g -Wall  -Wwrite-strings -Wshadow -lstdc++ 
-OPTFLAGS = -O3 -ffast-math -fopenmp # -O3 -framework Accelerate
+OPTFLAGS = -Ofast -fopenmp #-O2 -ffast-math # -O3 -framework Accelerate
 RPTFLAGS = -fopt-info-vec-all #-fopt-report=5 -fopt-report-phase=vec -fopt-report-phase=par
 #/usr/local/lib: fftw, /urs/lib: armadillo
 LFLAGS = -L/home/emilioerc/gsl/lib -L/usr/lib

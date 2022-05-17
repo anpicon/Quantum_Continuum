@@ -132,9 +132,6 @@ public:
 				else for(int j=-Mmax;j<=Mmax;j++) lm.push_back(count++);
     		}
 		}
-		cout << "VECTORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR" << endl;
-		for(auto a:lm) cout << a << " ";
-		cout << endl;
 	}
 };
 

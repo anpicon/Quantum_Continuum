@@ -386,7 +386,6 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
             {
                 for(auto lm: contstate[ind].lm)
                 {
-                        // cout << SpH(L,M,mmax) << endl;
                         complexd x,y,z; fp_input >> x >> y >> z;
                         if(Ej<bar)        (contstate[ind].DIPpump)[Ej][eps][lm][0]      = x*u1[0]+y*u1[1]+z*u1[2];
                         else if(bar == 0) (contstate[ind].DIPprobe)[Ej][eps][lm][0]     = x*u2[0]+y*u2[1]+z*u2[2];
@@ -395,6 +394,7 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
             }
         }
     }
+                                                                    // ADD NR > 1
 //     if (NR>1){   
 //         for (int iR=0; iR<NR; iR++)
 //         {
@@ -422,26 +422,6 @@ void Read_Cont_Dipoles(ifstream& fp_input,vec1C& contstate,int& ind,int& Ej,vec1
 //     }
 //         // //Starting the interpolation for a finer nuclear grid
 } // End Read Continuum Dipoles
-
-// void Read_Cont_Decays(ifstream& fp_input,vec1C& ArrayCont, int& ind)
-// {
-//     if (!fp_input.is_open())
-//     {
-//         cout << "Error opening Decays file" << endl;
-//         exit(1);
-//     }
-    
-//     printf("Reading Decays.txt file ...\n");
-    
-//     double dummy;
-//     int size = (ArrayCont[ind].StatCouplPump).size() + (ArrayCont[ind].StatCouplProbe).size();
-//     for (int i=0; i<size; i++)
-//     {
-//         fp_input >> dummy >> ArrayCont[ind].Gamma[i];
-//         //printf("For state %d the decay width is: %3.4f eV -> Lifetime: %3.4f fs\n",Ei,Gamma[Ei],0.659/Gamma[Ei]);
-//         ArrayCont[ind].Gamma[i]*=energy_eV_au; //we convert it from eV to a.u.
-//     }
-// }//End Read_Cont_Decays
 
 void Read_Decays(ifstream& fp_input,vec1d& Gamma, int NEi)
 {
@@ -482,7 +462,6 @@ void Read_Initial_State(ifstream& fp_input,vec2x& bgs)
         fp_input >> dummy;
         for (int Ei=0; Ei<NEi; Ei++)
         {
-            //complexd c;
             fp_input >> bgs[Ei][iR];
         }
     }

@@ -1,6 +1,6 @@
-        dt2=(dt/2.0);
-        dt3=(dt/3.0);
-        dt6=(dt/6.0);
+        // dt2=(dt/2.0);
+        // dt3=(dt/3.0);
+        // dt6=(dt/6.0);
         //------ 1st step Runge-Kutta
         EF1=pulse1.Gaussian(ncyc*sigma1,sigma1,time);
         EF2=pulse2.Gaussian(ncyc*sigma1+DELAY,sigma2,time);

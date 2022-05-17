@@ -17,9 +17,9 @@ double dR=1.;      // resolution of the internuclear grid
 vec1d R(1,0.);     // grid of internuclear distance
 double tf=0.;      // final time
 
-double dt2=(dt/2.0); // for RK
-double dt3=(dt/3.0); // for RK
-double dt6=(dt/6.0); // for RK
+double dt2; // for RK
+double dt3; // for RK
+double dt6; // for RK
 
 int icont=0;       // for RK, it controlls when observables are printed
 

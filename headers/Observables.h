@@ -26,7 +26,6 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& 
     }
 
 
-    //cout << "Norm " << sum << endl;
     fp_population << time*time_au_fs;
     for (int Ei=0; Ei<NEi; Ei++)
     {
@@ -44,6 +43,7 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& 
                     for(auto lm: ArrayCont[i].lm)
                     {
                         ContPopulation += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
+                        // ContPopulation += norm(ArrayCont[i].be[eps][lm][iR])/float(ArrayCont[i].NE);
                     }
                 }
             }
