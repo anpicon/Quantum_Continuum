@@ -32,3 +32,5 @@
 
         // ----- Calculates cont amplituds at the end of each step
         Calculate_Cont_Ampl(EF1, EF2, ArrayCont);
+        // cout << "Continuum population from state Nt: "<< ArrayCont[0].dip_BS[0][0] << endl;
+        // cout << "Continuum population from state Nc: "<< ArrayCont[0].dip_BS[1][0] << endl;

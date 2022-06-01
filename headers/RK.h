@@ -63,17 +63,21 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
                     Vt[0]+=c1*(Dip1[Ei][Ej][0]*EF1+Dip2[Ei][Ej][0]*EF2)*bgs[Ej][0];
                 }
                 int count =0;
+                // cout << "Ei " << Ei << endl;
                 for(auto dip:ArrayCont[i].UniqueStates){
                     if(Ei==dip){
                         // cout << "Ei: " << Ei << " dip: " << dip << endl;
                         // dipCont = ArrayCont[i].dip_BS[0][0];
+                        // dipCont = ArrayCont[i].dip_BS[ArrayCont[i].Indexes[1][dip]][0] / complexd(ArrayCont[i].NE);
                         dipCont = ArrayCont[i].dip_BS[ArrayCont[i].Indexes[1][dip]][0];
-                        dipCont = 0.0;
+                        // dipCont = ArrayCont[i].dip_BS[ArrayCont[i].Indexes[1][dip]][0] * ArrayCont[i].dE;
+                        // dipCont = 0.0;
                         // cout << "INdex: " << ArrayCont[i].Indexes[1][dip] << " dipcont: " << dipCont << endl;
                         break; // Once it is matched, do not continue searching
                     }
                     else dipCont = 0.0;
                 }
+                // cout << "dip " << dipCont << endl;
                 bgsv[Ei][0] = (-c1*PES[Ei][0]- 0.5*Gamma[Ei])*bgs[Ei][0] - Vt[0] - dipCont;
                 // cout << "Ei: " << Ei << " bgsv[Ei][0] " << bgsv[Ei][0] << " dip: " << dipCont << endl << endl;
             }
@@ -83,7 +87,6 @@ void Runge_Kutta_Df_fixed(vec1x& Vt, vec2x& bgs, vec2x& bgsv, vec2d& PES, vec3d&
         int NEi = PES.size();
     
         //#pragma omp parallel for schedule(dynamic) default(shared) -- it causes a problem due to Vt array, we should use Vt[Ei][iR]
-        complexd dipCont;
         for (int Ei=0; Ei<NEi; Ei++)
         {
             fill(Vt.begin(), Vt.end(), 0.);

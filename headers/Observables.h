@@ -42,8 +42,10 @@ bool check_conservation(ofstream& fp_population,vec2x& bgs, double time, vec1C& 
                 {
                     for(auto lm: ArrayCont[i].lm)
                     {
-                        ContPopulation += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
+                        // ContPopulation += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
+                        ContPopulation += norm(ArrayCont[i].be[eps][lm][iR]);
                         // ContPopulation += norm(ArrayCont[i].be[eps][lm][iR])/float(ArrayCont[i].NE);
+
                     }
                 }
             }
@@ -67,7 +69,8 @@ void PrintXPS(ofstream& fp_xps, double time, vec1C& ArrayCont){
             {
                 for(auto lm: ArrayCont[i].lm)
                 {
-                    XPS[eps] += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
+                    // XPS[eps] += norm(ArrayCont[i].be[eps][lm][iR])*ArrayCont[i].dE;
+                    XPS[eps] += norm(ArrayCont[i].be[eps][lm][iR])/float(ArrayCont[i].NE);
                 }
                 fp_xps << (ArrayCont[i].Emin + ArrayCont[i].dE*double(eps))*energy_au_eV;
                 fp_xps << " " << XPS[eps] << endl;

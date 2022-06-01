@@ -103,7 +103,10 @@ double Laser::Sin2_Envelope(double tinitial, double tfinal,double time){
 	else return 0.;
 }
 double Laser::Gaussian(double b, double sigma,double time){
-	if(pow(time-b,2)<40*sigma*sigma)return E0*sin(wl*(time-b)+CEP)*exp(-pow(time-b,2)/(2*sigma*sigma));
+	if(pow(time-b,2)<40*sigma*sigma){
+		// cout << "WWWWWWWWWWWWWWWWWWWWLLLLLLLLLLLLLLLLLLLLL"<< wl << endl;
+		return E0*sin(wl*(time-b)+CEP)*exp(-pow(time-b,2)/(2*sigma*sigma));
+	}
 	else return 0.;
 }
 double Laser::Gaussian_A(double b, double sigma,double time, double phase){

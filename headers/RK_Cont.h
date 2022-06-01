@@ -229,6 +229,7 @@ void Calculate_Cont_Ampl(double& EF1, double& EF2,vec1C& ArrayCont){
                 for(auto lm: ArrayCont[i].lm)
                 {
                     int count=0;
+                    // cout << "lm " << lm << endl;
                     for(auto j:ArrayCont[i].UniqueStates){ // Iterating throw different couplings
                         if(ArrayCont[i].Allow[0][j] == 1){
                             pulse1 = (ArrayCont[i].DIPpump)[ArrayCont[i].Indexes[0][j]][eps][lm][0]*EF1;
@@ -241,8 +242,11 @@ void Calculate_Cont_Ampl(double& EF1, double& EF2,vec1C& ArrayCont){
                         }
                         else pulse2 = (0,0);
 
-                        ArrayCont[i].dip_BS[count][0] += c1*(pulse1 + pulse2)*ArrayCont[i].be[eps][lm][0]*ArrayCont[i].dE;
+                        // ArrayCont[i].dip_BS[count][0] += c1*(pulse1 + pulse2)*ArrayCont[i].be[eps][lm][0]*ArrayCont[i].dE;
+                        ArrayCont[i].dip_BS[count][0] += c1*conj(pulse1 + pulse2)*(ArrayCont[i].be[eps][lm][0]);
                         // ArrayCont[i].dip_BS[count][0] += c1*(pulse1 + pulse2)*(ArrayCont[i].be[eps][lm][0] / complexd(ArrayCont[i].NE));
+                        // cout << "State: " << count << " pulse1 " << pulse1 << " pulse2 " << pulse2 << " dip " << c1*(pulse1 + pulse2)*(ArrayCont[i].be[eps][lm][0] / complexd(ArrayCont[i].NE)) << endl;
+                        //Vt[0]+=c1*(Dip1[Ei][Ej][0]*EF1+Dip2[Ei][Ej][0]*EF2)*bgs[Ej][0];
                         count++;
                     }
                 }
